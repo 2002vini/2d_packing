@@ -7,6 +7,7 @@ import numpy as np
 from matplotlib.path import Path
 from matplotlib.patches import PathPatch, Patch
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 import greedypacker as g
 import csv
@@ -118,9 +119,26 @@ def render_bin(binpack: g.BinManager, save: bool = False) -> None:
         plt.show()
     return
 
+def plotGraph(rectangles,num):
+    fig, ax = plt.subplots(figsize=(10, 8))
+    ax.set_xlim(0, 2655)
+    ax.set_ylim(0, 2100)
+    ax.set_title('MaximalRectangle1 Placements')
+
+    # Plot each rectangle
+    for rect in rectangles:
+        patch = patches.Rectangle((rect['x'], rect['y']), rect['width'], rect['height'], linewidth=1, edgecolor='b', facecolor='blue', alpha=0.5)
+        ax.add_patch(patch)
+
+    # Set aspect of the plot to be equal
+    ax.set_aspect('equal', adjustable='box')
+
+    # Save plot to a file instead of showing it
+    image_name = f"image_{count}.png"
+    plt.savefig('/Users/vinihundlani/Desktop/greedypacker/'+image_name)
 
 if __name__ == '__main__':
-    M = g.BinManager(138, 78, pack_algo='maximal_rectangle', heuristic='bottom_left', rotation=False, sorting=False, wastemap=False)
+    M = g.BinManager(2655,2100, pack_algo='maximal_rectangle', heuristic='best_area', rotation=True, sorting=True, wastemap=True)
     # M = g.BinManager(2655, 2100, pack_algo='guillotine', heuristic='best_shortside', rotation=False, sorting=False)
     # guillotine = [g.Item(2,3), g.Item(2,2), g.Item(2,1), g.Item(2,3), g.Item(2,2), g.Item(3,2)]
     # maximal = [g.Item(2,3), g.Item(3,3), g.Item(4,1), g.Item(2,3), g.Item(2,2), g.Item(1,2)]
@@ -132,7 +150,7 @@ if __name__ == '__main__':
     
 
     demoList = []    
-    with open('./tiles_data.csv', mode='r') as file:
+    with open('../demo_data.csv', mode='r') as file:
         csv_reader = csv.DictReader(file)
         for row in csv_reader:
             height = float(row['height'])
@@ -146,10 +164,18 @@ if __name__ == '__main__':
     M.execute()
 
     print(len(M.bins))
-
+    
+    plots=[]
     for bin in M.bins:
+        plotList = []
         for item in bin.items:
-            pass
+            plotList.append({"width": item.width, "height": item.height, "x": item.x, "y":item.y})
             # print(f"Height: {item.height}, Width: {item.width}, X: {item.x}, Y: {item.y}")
+        plots.append(plotList)
+    
+    count=0
+    for plot in plots:
+        plotGraph(plot,count)
+        count+=1
 
 

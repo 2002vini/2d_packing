@@ -9,6 +9,9 @@ from matplotlib.patches import PathPatch, Patch
 import matplotlib.pyplot as plt
 
 import greedypacker as g
+import csv
+
+from greedypacker.maximal_rectangles import MaximalRectangle
 
 
 
@@ -117,16 +120,36 @@ def render_bin(binpack: g.BinManager, save: bool = False) -> None:
 
 
 if __name__ == '__main__':
-    #M = g.BinManager(10, 6, pack_algo='maximal_rectangle', heuristic='bottom_left', rotation=False, sorting=False, wastemap=False)
-    M = g.BinManager(2655, 2100, pack_algo='guillotine', heuristic='best_shortside', rotation=False, sorting=False)
-    guillotine = [g.Item(2,3), g.Item(2,2), g.Item(2,1), g.Item(2,3), g.Item(2,2), g.Item(3,2)]
-    maximal = [g.Item(2,3), g.Item(3,3), g.Item(4,1), g.Item(2,3), g.Item(2,2), g.Item(1,2)]
-    shelf = [g.Item(2,3), g.Item(2,2), g.Item(2,1), g.Item(3,2), g.Item(1,1), g.Item(6,3), g.Item(3,2), g.Item(3,2), g.Item(4,2), g.Item(4,1)]
-    skyline = [g.Item(3,2), g.Item(2,1), g.Item(4,2), g.Item(1,3), g.Item(4,2), g.Item(2,3), g.Item(2, 2)]
-    demoList=[g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(386,310),g.Item(386,310),g.Item(386,310),g.Item(386,310),g.Item(386,310),g.Item(860,320),g.Item(860,320),g.Item(564,310),g.Item(452,293),g.Item(720,530),g.Item(720,530),g.Item(696,530),g.Item(696,100)]
+    M = g.BinManager(138, 78, pack_algo='maximal_rectangle', heuristic='bottom_left', rotation=False, sorting=False, wastemap=False)
+    # M = g.BinManager(2655, 2100, pack_algo='guillotine', heuristic='best_shortside', rotation=False, sorting=False)
+    # guillotine = [g.Item(2,3), g.Item(2,2), g.Item(2,1), g.Item(2,3), g.Item(2,2), g.Item(3,2)]
+    # maximal = [g.Item(2,3), g.Item(3,3), g.Item(4,1), g.Item(2,3), g.Item(2,2), g.Item(1,2)]
+    # shelf = [g.Item(2,3), g.Item(2,2), g.Item(2,1), g.Item(3,2), g.Item(1,1), g.Item(6,3), g.Item(3,2), g.Item(3,2), g.Item(4,2), g.Item(4,1)]
+    # skyline = [g.Item(3,2), g.Item(2,1), g.Item(4,2), g.Item(1,3), g.Item(4,2), g.Item(2,3), g.Item(2, 2)]
+    # demoList=[g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(386,310),g.Item(386,310),g.Item(386,310),g.Item(386,310),g.Item(386,310),g.Item(860,320),g.Item(860,320),g.Item(564,310),g.Item(452,293),g.Item(720,530),g.Item(720,530),g.Item(696,530),g.Item(696,100)]
+    # print(demoList)
+    # render_bin(M, save=True)
+    
+
+    demoList = []    
+    with open('./tiles_data.csv', mode='r') as file:
+        csv_reader = csv.DictReader(file)
+        for row in csv_reader:
+            height = float(row['height'])
+            width = float(row['width'])
+            quantity = row['quantity']
+            
+            for _ in range(int(quantity)):
+                demoList.append(g.Item(height, width))
+    
     M.add_items(*demoList)
     M.execute()
-    print(type(M.bins))
-    print(M.bins)
-    # render_bin(M, save=True)
-   
+
+    print(len(M.bins))
+
+    for bin in M.bins:
+        for item in bin.items:
+            pass
+            # print(f"Height: {item.height}, Width: {item.width}, X: {item.x}, Y: {item.y}")
+
+

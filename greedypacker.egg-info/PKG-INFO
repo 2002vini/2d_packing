@@ -1,13 +1,13 @@
-Metadata-Version: 1.2
+Metadata-Version: 2.1
 Name: greedypacker
 Version: 0.4.1
 Summary: A two dimensional binpacking library
 Home-page: https://github.com/ssbothwell/BinPack
+Download-URL: https://github.com/ssbothwell/greedypacker/archive/v0.4.1.tar.gz
 Author: Solomon Bothwell
 Author-email: ssbothwell@gmail.com
 License: Apache2
-Download-URL: https://github.com/ssbothwell/greedypacker/archive/v0.4.1.tar.gz
-Description: UNKNOWN
 Keywords: binpacking,algorithm,greedy,library
-Platform: UNKNOWN
 Requires-Python: >=3
+License-File: LICENSE.txt
+Requires-Dist: sortedcontainers

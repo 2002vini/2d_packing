@@ -11,7 +11,10 @@ import matplotlib.pyplot as plt
 import greedypacker as g
 
 
+
 def get_vertices(i: g.Item, margin: int = 0.0) -> List[int]:
+    print(type(i))
+    print("print i.x",i.x)
     corners = [(i.x, i.y), 
             (i.x+i.width, i.y),
             (i.x+i.width, i.y+i.height),
@@ -33,13 +36,13 @@ def generate_path(i: g.Item, margin: float = 0.0) -> Path:
     vertices = np.array(vertices, float) 
     return Path(vertices, codes)
 
-#def generate_path(items: List[g.Item], margin: bool = False) -> Path:
+# def generate_path(items: List[g.Item], margin: bool = False) -> Path:
 #    vertices = []
 #    codes = []
 #    for i in items:
 #        codes += [Path.MOVETO] + [Path.LINETO]*3 + [Path.CLOSEPOLY]
 #        vertices += get_vertices(i, margin) + [(0, 0)]
-#
+
 #    vertices = np.array(vertices, float) 
 #    return Path(vertices, codes)
 
@@ -50,8 +53,8 @@ def draw_wastemap(binpack: g.BinManager) -> None:
 
 def render_bin(binpack: g.BinManager, save: bool = False) -> None:
     fig, ax = plt.subplots()
-    for item in binpack.items:
-        path = generate_path(item)
+    for Item in binpack.items:
+        path = generate_path(Item)
         packed_item = PathPatch(path, facecolor='blue', edgecolor='green', label='packed items')
         ax.add_patch(packed_item)
     handles = [packed_item]
@@ -115,12 +118,15 @@ def render_bin(binpack: g.BinManager, save: bool = False) -> None:
 
 if __name__ == '__main__':
     #M = g.BinManager(10, 6, pack_algo='maximal_rectangle', heuristic='bottom_left', rotation=False, sorting=False, wastemap=False)
-    M = g.BinManager(10, 6, pack_algo='guillotine', heuristic='best_shortside', rotation=False, sorting=False)
+    M = g.BinManager(2655, 2100, pack_algo='guillotine', heuristic='best_shortside', rotation=False, sorting=False)
     guillotine = [g.Item(2,3), g.Item(2,2), g.Item(2,1), g.Item(2,3), g.Item(2,2), g.Item(3,2)]
     maximal = [g.Item(2,3), g.Item(3,3), g.Item(4,1), g.Item(2,3), g.Item(2,2), g.Item(1,2)]
     shelf = [g.Item(2,3), g.Item(2,2), g.Item(2,1), g.Item(3,2), g.Item(1,1), g.Item(6,3), g.Item(3,2), g.Item(3,2), g.Item(4,2), g.Item(4,1)]
     skyline = [g.Item(3,2), g.Item(2,1), g.Item(4,2), g.Item(1,3), g.Item(4,2), g.Item(2,3), g.Item(2, 2)]
-    M.add_items(*maximal)
+    demoList=[g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(386,310),g.Item(386,310),g.Item(386,310),g.Item(386,310),g.Item(386,310),g.Item(860,320),g.Item(860,320),g.Item(564,310),g.Item(452,293),g.Item(720,530),g.Item(720,530),g.Item(696,530),g.Item(696,100)]
+    M.add_items(*demoList)
     M.execute()
+    print(type(M.bins))
     print(M.bins)
-    #render_bin(M, save=True)
+    # render_bin(M, save=True)
+   

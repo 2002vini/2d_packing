@@ -8,11 +8,10 @@ from matplotlib.path import Path
 from matplotlib.patches import PathPatch, Patch
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-
 import greedypacker as g
-import csv
-
 from greedypacker.maximal_rectangles import MaximalRectangle
+import csv
+import os
 
 
 
@@ -119,63 +118,98 @@ def render_bin(binpack: g.BinManager, save: bool = False) -> None:
         plt.show()
     return
 
-def plotGraph(rectangles,num):
+
+def plotGraph(rectangles, num, heuristic):
     fig, ax = plt.subplots(figsize=(10, 8))
-    ax.set_xlim(0, 2655)
-    ax.set_ylim(0, 2100)
-    ax.set_title('MaximalRectangle1 Placements')
+    ax.set_xlim(0, 138)
+    ax.set_ylim(0, 78)
+    ax.set_title(f'Graph: {num}')
 
     # Plot each rectangle
     for rect in rectangles:
         patch = patches.Rectangle((rect['x'], rect['y']), rect['width'], rect['height'], linewidth=1, edgecolor='b', facecolor='blue', alpha=0.5)
         ax.add_patch(patch)
 
+        # # Text to be annotated
+        # text = f"{rect['width']} x {rect['height']}"
+        # # Estimated text width (adjust scale factor as needed)
+        # text_width_est = len(text) * 0.6  # Adjust this scale factor based on your font/settings
+        # text_height_est = 8  # Approximate height of text
+
+        # # Determine if text should be rotated or skipped
+        # if rect['width'] > text_width_est and rect['height'] > text_height_est:
+        #     rotation = 0  # Fits horizontally
+        # elif rect['height'] > text_width_est and rect['width'] > text_height_est:
+        #     rotation = 90  # Fits vertically
+        # else:
+        #     continue  # Skip annotation if it doesn't fit either way
+
+        # # Annotate dimensions
+        # ax.annotate(text,
+        #             (rect['x'] + rect['width']/2, rect['y'] + rect['height']/2),
+        #             color='white', weight='bold', fontsize=8, ha='center', va='center', rotation=rotation)
+
     # Set aspect of the plot to be equal
     ax.set_aspect('equal', adjustable='box')
 
+
+    # Check if the directory exists, create if not
+    directory_path = f'/media/vaibhav/5C60D97E60D95F78/marble cutting/2d_packing/plots/{heuristic}/'
+    if not os.path.exists(directory_path):
+        os.makedirs(directory_path)
+
     # Save plot to a file instead of showing it
-    image_name = f"image_{count}.png"
-    plt.savefig('/Users/vinihundlani/Desktop/greedypacker/'+image_name)
+    image_name = f"image_{num}.png"
+    plt.savefig(directory_path + image_name)
+
+    # Close the figure to free memory
+    plt.close(fig)
+
 
 if __name__ == '__main__':
-    M = g.BinManager(2655,2100, pack_algo='maximal_rectangle', heuristic='best_area', rotation=True, sorting=True, wastemap=True)
     # M = g.BinManager(2655, 2100, pack_algo='guillotine', heuristic='best_shortside', rotation=False, sorting=False)
-    # guillotine = [g.Item(2,3), g.Item(2,2), g.Item(2,1), g.Item(2,3), g.Item(2,2), g.Item(3,2)]
-    # maximal = [g.Item(2,3), g.Item(3,3), g.Item(4,1), g.Item(2,3), g.Item(2,2), g.Item(1,2)]
-    # shelf = [g.Item(2,3), g.Item(2,2), g.Item(2,1), g.Item(3,2), g.Item(1,1), g.Item(6,3), g.Item(3,2), g.Item(3,2), g.Item(4,2), g.Item(4,1)]
-    # skyline = [g.Item(3,2), g.Item(2,1), g.Item(4,2), g.Item(1,3), g.Item(4,2), g.Item(2,3), g.Item(2, 2)]
-    # demoList=[g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(900,320),g.Item(386,310),g.Item(386,310),g.Item(386,310),g.Item(386,310),g.Item(386,310),g.Item(860,320),g.Item(860,320),g.Item(564,310),g.Item(452,293),g.Item(720,530),g.Item(720,530),g.Item(696,530),g.Item(696,100)]
-    # print(demoList)
     # render_bin(M, save=True)
-    
-
-    demoList = []    
-    with open('../demo_data.csv', mode='r') as file:
-        csv_reader = csv.DictReader(file)
-        for row in csv_reader:
-            height = float(row['height'])
-            width = float(row['width'])
-            quantity = row['quantity']
-            
-            for _ in range(int(quantity)):
-                demoList.append(g.Item(height, width))
-    
-    M.add_items(*demoList)
-    M.execute()
-
-    print(len(M.bins))
-    
-    plots=[]
-    for bin in M.bins:
-        plotList = []
-        for item in bin.items:
-            plotList.append({"width": item.width, "height": item.height, "x": item.x, "y":item.y})
-            # print(f"Height: {item.height}, Width: {item.width}, X: {item.x}, Y: {item.y}")
-        plots.append(plotList)
-    
-    count=0
-    for plot in plots:
-        plotGraph(plot,count)
-        count+=1
 
 
+    algorithms = ['maximal_rectangle', 'shelf', 'guillotine', 'skyline']
+    maximal_rectangle_heuristics = ['best_area', 'best_shortside', 'best_longside', 'worst_area', 'worst_shortside', 'worst_longside', 'bottom_left', 'contact_point']
+    shelf_heuristics = ['best_width_fit', 'best_height_fit', 'best_area_fit', 'worst_width_fit', 'worst_height_fit', 'worst_area_fit', 'next_fit', 'first_fit']
+    guillotine_heuristics = ['best_area', 'best_shortside', 'best_longside', 'worst_area', 'worst_shortside', 'worst_longside']
+    skyline_heuristics = ['bottom_left', 'best_fit']
+
+    # for heuristic in shelf_heuristics:
+    # for heuristic in guillotine_heuristics:
+    # for heuristic in skyline_heuristics:
+    for heuristic in maximal_rectangle_heuristics:
+        M = g.BinManager(138,78, pack_algo='maximal_rectangle', heuristic=heuristic, rotation=True, sorting=True, wastemap=True)
+        # M = g.BinManager(138,78, pack_algo='guillotine', heuristic=heuristic, rotation=True, sorting=True, wastemap=True)
+        # M = g.BinManager(138,78, pack_algo='skyline', heuristic=heuristic, rotation=True, sorting=True, wastemap=True)
+        # M = g.BinManager(138,78, pack_algo='shelf', heuristic=heuristic, rotation=True, sorting=True, wastemap=True)
+        
+        demoList = []    
+        with open('./tiles_data_2.csv', mode='r') as file:
+            csv_reader = csv.DictReader(file)
+            for row in csv_reader:
+                height = float(row['height'])
+                width = float(row['width'])
+                quantity = row['quantity']
+                
+                for _ in range(int(quantity)):
+                    demoList.append(g.Item(height, width))
+        
+        M.add_items(*demoList)
+        M.execute()
+
+        print(f"Heuristic: {heuristic}, Bins: {len(M.bins)}")
+        
+        plots=[]
+        for bin in M.bins:
+            plotList = []
+            for item in bin.items:
+                plotList.append({"width": item.width, "height": item.height, "x": item.x, "y":item.y})
+            plots.append(plotList)
+        
+        count=0
+        for plot in plots:
+            plotGraph(plot,count, heuristic)
+            count+=1

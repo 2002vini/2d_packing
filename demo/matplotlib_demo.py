@@ -130,31 +130,31 @@ def plotGraph(rectangles, num, algo, heuristic):
         patch = patches.Rectangle((rect['x'], rect['y']), rect['width'], rect['height'], linewidth=1, edgecolor='b', facecolor='blue', alpha=0.5)
         ax.add_patch(patch)
 
-        # # Text to be annotated
-        # text = f"{rect['width']} x {rect['height']}"
-        # # Estimated text width (adjust scale factor as needed)
-        # text_width_est = len(text) * 0.6  # Adjust this scale factor based on your font/settings
-        # text_height_est = 8  # Approximate height of text
+        # Text to be annotated
+        text = f"{rect['width']} x {rect['height']}"
+        # Estimated text width (adjust scale factor as needed)
+        text_width_est = len(text) * 0.6  # Adjust this scale factor based on your font/settings
+        text_height_est = 8  # Approximate height of text
 
-        # # Determine if text should be rotated or skipped
-        # if rect['width'] > text_width_est and rect['height'] > text_height_est:
-        #     rotation = 0  # Fits horizontally
-        # elif rect['height'] > text_width_est and rect['width'] > text_height_est:
-        #     rotation = 90  # Fits vertically
-        # else:
-        #     continue  # Skip annotation if it doesn't fit either way
+        # Determine if text should be rotated or skipped
+        if rect['width'] > text_width_est and rect['height'] > text_height_est:
+            rotation = 0  # Fits horizontally
+        elif rect['height'] > text_width_est and rect['width'] > text_height_est:
+            rotation = 90  # Fits vertically
+        else:
+            continue  # Skip annotation if it doesn't fit either way
 
-        # # Annotate dimensions
-        # ax.annotate(text,
-        #             (rect['x'] + rect['width']/2, rect['y'] + rect['height']/2),
-        #             color='white', weight='bold', fontsize=8, ha='center', va='center', rotation=rotation)
+        # Annotate dimensions
+        ax.annotate(text,
+                    (rect['x'] + rect['width']/2, rect['y'] + rect['height']/2),
+                    color='white', weight='bold', fontsize=8, ha='center', va='center', rotation=rotation)
 
     # Set aspect of the plot to be equal
     ax.set_aspect('equal', adjustable='box')
 
 
     # Check if the directory exists, create if not
-    directory_path = f'/media/vaibhav/5C60D97E60D95F78/marble cutting/2d_packing/plots/{algo}/{heuristic}/'
+    directory_path = f'/Users/vinihundlani/Desktop/greedypacker/plots/{algo}/{heuristic}/'
     if not os.path.exists(directory_path):
         os.makedirs(directory_path)
 
@@ -172,15 +172,15 @@ if __name__ == '__main__':
 
 
     algorithms = {
+
                     'maximal_rectangle': ['best_area', 'best_shortside', 'best_longside', 'worst_area', 'worst_shortside', 'worst_longside', 'bottom_left', 'contact_point'], 
-                    'guillotine': ['best_area', 'best_shortside', 'best_longside', 'worst_area', 'worst_shortside', 'worst_longside'], 
-                    'shelf': ['best_width_fit', 'best_height_fit', 'best_area_fit', 'worst_width_fit', 'worst_height_fit', 'worst_area_fit', 'next_fit', 'first_fit'], 
-                    'skyline': ['bottom_left', 'best_fit']
+                    # 'guillotine': ['best_area', 'best_shortside', 'best_longside', 'worst_area', 'worst_shortside', 'worst_longside'], 
+                    # 'skyline': ['bottom_left', 'best_fit']
                 }
 
     for algo in algorithms:
         for heuristic in algorithms[algo]:
-            M = g.BinManager(138,78, pack_algo=algo, heuristic=heuristic, rotation=True, sorting=True, wastemap=True)
+            M = g.BinManager(138,78, pack_algo=algo, heuristic=heuristic, rotation=True, sorting=False, wastemap=True)
             
             demoList = []    
             with open('./tiles_data_2.csv', mode='r') as file:

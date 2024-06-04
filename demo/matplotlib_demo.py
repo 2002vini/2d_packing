@@ -119,7 +119,7 @@ def render_bin(binpack: g.BinManager, save: bool = False) -> None:
     return
 
 
-def plotGraph(rectangles, num, heuristic):
+def plotGraph(rectangles, num, algo, heuristic):
     fig, ax = plt.subplots(figsize=(10, 8))
     ax.set_xlim(0, 138)
     ax.set_ylim(0, 78)
@@ -154,7 +154,7 @@ def plotGraph(rectangles, num, heuristic):
 
 
     # Check if the directory exists, create if not
-    directory_path = f'/media/vaibhav/5C60D97E60D95F78/marble cutting/2d_packing/plots/{heuristic}/'
+    directory_path = f'/media/vaibhav/5C60D97E60D95F78/marble cutting/2d_packing/plots/{algo}/{heuristic}/'
     if not os.path.exists(directory_path):
         os.makedirs(directory_path)
 
@@ -171,45 +171,41 @@ if __name__ == '__main__':
     # render_bin(M, save=True)
 
 
-    algorithms = ['maximal_rectangle', 'shelf', 'guillotine', 'skyline']
-    maximal_rectangle_heuristics = ['best_area', 'best_shortside', 'best_longside', 'worst_area', 'worst_shortside', 'worst_longside', 'bottom_left', 'contact_point']
-    shelf_heuristics = ['best_width_fit', 'best_height_fit', 'best_area_fit', 'worst_width_fit', 'worst_height_fit', 'worst_area_fit', 'next_fit', 'first_fit']
-    guillotine_heuristics = ['best_area', 'best_shortside', 'best_longside', 'worst_area', 'worst_shortside', 'worst_longside']
-    skyline_heuristics = ['bottom_left', 'best_fit']
+    algorithms = {
+                    'maximal_rectangle': ['best_area', 'best_shortside', 'best_longside', 'worst_area', 'worst_shortside', 'worst_longside', 'bottom_left', 'contact_point'], 
+                    'guillotine': ['best_area', 'best_shortside', 'best_longside', 'worst_area', 'worst_shortside', 'worst_longside'], 
+                    'shelf': ['best_width_fit', 'best_height_fit', 'best_area_fit', 'worst_width_fit', 'worst_height_fit', 'worst_area_fit', 'next_fit', 'first_fit'], 
+                    'skyline': ['bottom_left', 'best_fit']
+                }
 
-    # for heuristic in shelf_heuristics:
-    # for heuristic in guillotine_heuristics:
-    # for heuristic in skyline_heuristics:
-    for heuristic in maximal_rectangle_heuristics:
-        M = g.BinManager(138,78, pack_algo='maximal_rectangle', heuristic=heuristic, rotation=True, sorting=True, wastemap=True)
-        # M = g.BinManager(138,78, pack_algo='guillotine', heuristic=heuristic, rotation=True, sorting=True, wastemap=True)
-        # M = g.BinManager(138,78, pack_algo='skyline', heuristic=heuristic, rotation=True, sorting=True, wastemap=True)
-        # M = g.BinManager(138,78, pack_algo='shelf', heuristic=heuristic, rotation=True, sorting=True, wastemap=True)
-        
-        demoList = []    
-        with open('./tiles_data_2.csv', mode='r') as file:
-            csv_reader = csv.DictReader(file)
-            for row in csv_reader:
-                height = float(row['height'])
-                width = float(row['width'])
-                quantity = row['quantity']
-                
-                for _ in range(int(quantity)):
-                    demoList.append(g.Item(height, width))
-        
-        M.add_items(*demoList)
-        M.execute()
+    for algo in algorithms:
+        for heuristic in algorithms[algo]:
+            M = g.BinManager(138,78, pack_algo=algo, heuristic=heuristic, rotation=True, sorting=True, wastemap=True)
+            
+            demoList = []    
+            with open('./tiles_data_2.csv', mode='r') as file:
+                csv_reader = csv.DictReader(file)
+                for row in csv_reader:
+                    height = float(row['height'])
+                    width = float(row['width'])
+                    quantity = row['quantity']
+                    
+                    for _ in range(int(quantity)):
+                        demoList.append(g.Item(height, width))
+            
+            M.add_items(*demoList)
+            M.execute()
 
-        print(f"Heuristic: {heuristic}, Bins: {len(M.bins)}")
-        
-        plots=[]
-        for bin in M.bins:
-            plotList = []
-            for item in bin.items:
-                plotList.append({"width": item.width, "height": item.height, "x": item.x, "y":item.y})
-            plots.append(plotList)
-        
-        count=0
-        for plot in plots:
-            plotGraph(plot,count, heuristic)
-            count+=1
+            print(f"Algo: {algo}, Heuristic: {heuristic}, Bins: {len(M.bins)}")
+            
+            plots=[]
+            for bin in M.bins:
+                plotList = []
+                for item in bin.items:
+                    plotList.append({"width": item.width, "height": item.height, "x": item.x, "y":item.y})
+                plots.append(plotList)
+            
+            count=0
+            for plot in plots:
+                plotGraph(plot,count, algo, heuristic)
+                count+=1

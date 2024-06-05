@@ -147,7 +147,7 @@ def plotGraph(rectangles, num, algo, heuristic):
 
 
     # Check if the directory exists, create if not
-    directory_path = f'/Users/vinihundlani/Desktop/greedypacker/plots/{algo}/{heuristic}/'
+    directory_path = f'{os.getcwd()}/plots/{algo}/{heuristic}/'
     if not os.path.exists(directory_path):
         os.makedirs(directory_path)
 

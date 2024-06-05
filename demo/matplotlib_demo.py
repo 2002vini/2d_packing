@@ -1,12 +1,6 @@
-from typing import List
-from random import randint
-import numpy as np
-from matplotlib.path import Path
-from matplotlib.patches import PathPatch, Patch
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import greedypacker as g
-from greedypacker.maximal_rectangles import MaximalRectangle
 import csv
 import os
 

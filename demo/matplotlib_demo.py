@@ -175,7 +175,7 @@ if __name__ == '__main__':
             
             demoList = []    
             total_tiles = 0
-            with open('./tiles_data_5.csv', mode='r') as file:
+            with open('./tiles_data_8.csv', mode='r') as file:
                 csv_reader = csv.DictReader(file)
                 for row in csv_reader:
                     height = float(row['height'])
@@ -198,10 +198,10 @@ if __name__ == '__main__':
                     plotList.append({"width": item.width, "height": item.height, "x": item.x, "y":item.y})
                 plots.append(plotList)
             
-            count=0
-            for plot in plots:
-                plotGraph(plot,count, algo, heuristic)
-                count+=1
+            # count=0
+            # for plot in plots:
+            #     plotGraph(plot,count, algo, heuristic)
+            #     count+=1
 
 
 

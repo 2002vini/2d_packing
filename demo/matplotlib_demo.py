@@ -160,9 +160,7 @@ def plotGraph(rectangles, num, algo, heuristic):
 
 
 if __name__ == '__main__':
-    # M = g.BinManager(2655, 2100, pack_algo='guillotine', heuristic='best_shortside', rotation=False, sorting=False)
     # render_bin(M, save=True)
-
 
     algorithms = {
 
@@ -173,15 +171,17 @@ if __name__ == '__main__':
 
     for algo in algorithms:
         for heuristic in algorithms[algo]:
-            M = g.BinManager(138,78, pack_algo=algo, heuristic=heuristic, rotation=True, sorting=False, wastemap=True)
+            M = g.BinManager(138,78, pack_algo=algo, heuristic=heuristic, rotation=True, sorting=True, wastemap=True)
             
             demoList = []    
-            with open('./tiles_data_2.csv', mode='r') as file:
+            total_tiles = 0
+            with open('./tiles_data_5.csv', mode='r') as file:
                 csv_reader = csv.DictReader(file)
                 for row in csv_reader:
                     height = float(row['height'])
                     width = float(row['width'])
                     quantity = row['quantity']
+                    total_tiles += int(quantity)
                     
                     for _ in range(int(quantity)):
                         demoList.append(g.Item(height, width))
@@ -189,7 +189,7 @@ if __name__ == '__main__':
             M.add_items(*demoList)
             M.execute()
 
-            print(f"Algo: {algo}, Heuristic: {heuristic}, Bins: {len(M.bins)}")
+            print(f"Algo: {algo}, Heuristic: {heuristic}, Total Tiles: {total_tiles}, Bins: {len(M.bins)}")
             
             plots=[]
             for bin in M.bins:
@@ -202,3 +202,14 @@ if __name__ == '__main__':
             for plot in plots:
                 plotGraph(plot,count, algo, heuristic)
                 count+=1
+
+
+
+# *** ACTUAL ANSWERS ***
+# Tile Data 2: 63
+# Tile Data 3: 42
+# Tile Data 4: 10
+# Tile Data 5: 54
+# Tile Data 6: 72
+# Tile Data 7: 14
+# Tile Data 8: 98

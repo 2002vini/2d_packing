@@ -59,7 +59,7 @@ if __name__ == '__main__':
             
             demoList = []    
             total_tiles = 0
-            with open('./tiles_data_4.csv', mode='r') as file:
+            with open('../static/csv/tiles_data_4.csv', mode='r') as file:
                 csv_reader = csv.DictReader(file)
                 for row in csv_reader:
                     height = float(row['height'])
@@ -73,17 +73,28 @@ if __name__ == '__main__':
             M.add_items(*demoList)
             M.execute()
 
-            print(f"Algo: {algo}, Heuristic: {heuristic}, Total Tiles: {total_tiles}, Bins: {len(M.bins)}")
+            # print(f"Algo: {algo}, Heuristic: {heuristic}, Total Tiles: {total_tiles}, Bins: {len(M.bins)}")
+            print(f"Algo: {algo}, Heuristic: {heuristic}, Total Tiles: {total_tiles}")
+
+            
             
             plots=[]
+            area_occupied=0
+            total_area=0
             for bin in M.bins:
                 plotList = []
                 for item in bin.items:
                     plotList.append({"width": item.width, "height": item.height, "x": item.x, "y":item.y})
+                    area_occupied+=item.area
                 plots.append(plotList)
+                total_area+=(138*78)
+            
+            percentage_occupied = (area_occupied / total_area) * 100
+            percentage_wasted = 100 - percentage_occupied
+            print(f"Area Occupied: {area_occupied}, Total Area: {total_area}, Percentage Occupied: {round(percentage_occupied, 3)}%, Percentage Wasted: {round(percentage_wasted, 3)}%")
 
-            print(plots)            
-            # count=0
+
+           
             # for plot in plots:
             #     plotGraph(plot,count, algo, heuristic)
             #     count+=1

@@ -3,3 +3,4 @@ __pycache__/
 # editor files
 *~
 env
+plots/

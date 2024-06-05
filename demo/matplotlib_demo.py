@@ -125,29 +125,22 @@ def plotGraph(rectangles, num, algo, heuristic):
     ax.set_ylim(0, 78)
     ax.set_title(f'Graph: {num}')
 
+    margin = 1
+
     # Plot each rectangle
     for rect in rectangles:
         patch = patches.Rectangle((rect['x'], rect['y']), rect['width'], rect['height'], linewidth=1, edgecolor='b', facecolor='blue', alpha=0.5)
         ax.add_patch(patch)
 
-        # Text to be annotated
-        text = f"{rect['width']} x {rect['height']}"
-        # Estimated text width (adjust scale factor as needed)
-        text_width_est = len(text) * 0.6  # Adjust this scale factor based on your font/settings
-        text_height_est = 8  # Approximate height of text
+        # Annotate width inside the rectangle with margin
+        ax.text(rect['x'] + rect['width']/2, rect['y'] + margin, f"{rect['width']}", 
+                verticalalignment='bottom', horizontalalignment='center', 
+                fontsize=8, color='black', weight='bold')
 
-        # Determine if text should be rotated or skipped
-        if rect['width'] > text_width_est and rect['height'] > text_height_est:
-            rotation = 0  # Fits horizontally
-        elif rect['height'] > text_width_est and rect['width'] > text_height_est:
-            rotation = 90  # Fits vertically
-        else:
-            continue  # Skip annotation if it doesn't fit either way
-
-        # Annotate dimensions
-        ax.annotate(text,
-                    (rect['x'] + rect['width']/2, rect['y'] + rect['height']/2),
-                    color='white', weight='bold', fontsize=8, ha='center', va='center', rotation=rotation)
+        # Annotate height inside the rectangle with margin
+        ax.text(rect['x'] + margin, rect['y'] + rect['height']/2, f"{rect['height']}", 
+                verticalalignment='center', horizontalalignment='left', 
+                fontsize=8, color='black', weight='bold', rotation=90)
 
     # Set aspect of the plot to be equal
     ax.set_aspect('equal', adjustable='box')

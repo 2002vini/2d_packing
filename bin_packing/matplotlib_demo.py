@@ -56,6 +56,64 @@ def plot_graph(slab_data, num, algo, heuristic, total_bins_used):
     plt.close(fig)
 
 
+def custom_data_input(upload_type, algo, heuristic, inventory_data=None, filename=None):
+    M = g.BinManager(SLAB_LENGTH, SLAB_WIDTH, pack_algo=algo, heuristic=heuristic, rotation=True, sorting=True, wastemap=True)
+    demoList = []
+
+    if upload_type == 'manual':
+        if inventory_data:
+            for data in inventory_data:
+                quantity = data['quantity']
+                length = data['length']
+                width = data['width']
+                for _ in range(int(quantity)):
+                    demoList.append(g.Item(length, width))
+        else:
+            raise ValueError("Please provide Inventory Data.")
+    elif upload_type == 'csv':
+        if filename:
+            ROOT_DIR = Path(__file__).resolve().parent.parent
+            file_path = f'{ROOT_DIR}/static/csv/{filename}'
+            with open(file_path, mode='r') as file:
+                csv_reader = csv.DictReader(file)
+                for item in csv_reader:
+                    height = float(item['length'])
+                    width = float(item['width'])
+                    quantity = int(item['quantity'])
+
+                    for _ in range(int(quantity)):
+                        demoList.append(g.Item(height, width))
+        else:
+            raise ValueError("Please provide a valid filename for CSV data.")
+    M.add_items(*demoList)
+    M.execute()
+
+    plots = []
+    total_bins_used = len(M.bins)
+    slab_total_area = SLAB_LENGTH * SLAB_WIDTH
+    global_total_area = SLAB_LENGTH * SLAB_WIDTH * total_bins_used
+    for bin in M.bins:
+        slab_details = {}
+        plotList = []
+        area_occupied = 0
+        for rectangle in bin.items:
+            area_occupied += rectangle.area
+            plotList.append({"width": rectangle.width, "height": rectangle.height, "x": rectangle.x, "y": rectangle.y})
+
+        percentage_occupied = round((area_occupied / slab_total_area) * 100, 3)
+        slab_details['slab_percentage_occupied'] = percentage_occupied
+        slab_details['slab_percentage_wasted'] = round(100 - percentage_occupied, 3)
+        slab_details['rectangles'] = plotList
+        plots.append(slab_details)
+
+    return {
+        'plots': plots,
+        'total_bins_used': total_bins_used,
+        'slab_total_area': slab_total_area,
+        'global_total_area': global_total_area
+    }
+
+
 if __name__ == '__main__':
     algorithms = {
         'maximal_rectangle': ['best_area'],
@@ -66,50 +124,11 @@ if __name__ == '__main__':
 
     for algo in algorithms:
         for heuristic in algorithms[algo]:
-            M = g.BinManager(SLAB_LENGTH,SLAB_WIDTH, pack_algo=algo, heuristic=heuristic, rotation=True, sorting=True, wastemap=True)
-            
-            demoList = []    
-            total_tiles = 0
-            ROOT_DIR = Path(__file__).resolve().parent.parent
-            filepath = f'{ROOT_DIR}/static/csv/tiles_data_4.csv'
-
-            with open(filepath, mode='r') as file:
-                csv_reader = csv.DictReader(file)
-                for row in csv_reader:
-                    height = float(row['height'])
-                    width = float(row['width'])
-                    quantity = row['quantity']
-                    total_tiles += int(quantity)
-
-                    for _ in range(int(quantity)):
-                        demoList.append(g.Item(height, width))
-
-            M.add_items(*demoList)
-            M.execute()
-
-            print(f"Algo: {algo}, Heuristic: {heuristic}, Total Tiles: {total_tiles}, Bins: {len(M.bins)}")
-
-            plots = []
-            total_bins_used = len(M.bins)
-            slab_total_area = SLAB_LENGTH * SLAB_WIDTH
-            global_total_area = SLAB_LENGTH * SLAB_WIDTH * total_bins_used
-            for bin in M.bins:
-                slab_details = {}
-                plotList = []
-                area_occupied = 0
-                for rectangle in bin.items:
-                    area_occupied += rectangle.area
-                    plotList.append({"width": rectangle.width, "height": rectangle.height, "x": rectangle.x, "y": rectangle.y})
-
-                percentage_occupied = round((area_occupied / slab_total_area) * 100, 3)
-                slab_details['slab_percentage_occupied'] = percentage_occupied
-                slab_details['slab_percentage_wasted'] = round(100 - percentage_occupied, 3)
-                slab_details['rectangles'] = plotList
-                plots.append(slab_details)
+            result = custom_data_input('csv', algo, heuristic, [], 'tiles_data_4.csv')
 
             count = 0
-            for slab_data in plots:
-                plot_graph(slab_data, count, algo, heuristic, total_bins_used)
+            for slab_data in result['plots']:
+                plot_graph(slab_data, count, algo, heuristic, result['total_bins_used'])
                 count += 1
 
 

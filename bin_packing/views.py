@@ -1,4 +1,3 @@
-import json
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
@@ -16,7 +15,8 @@ def receive_panels(request):
         panels = [{'length': float(length), 'width': float(width), 'quantity': int(quantity)}
                   for length, width, quantity in zip(lengths, widths, quantities)]
 
-        print(json.dumps(panels, indent=4))
+        for item in panels:
+            print(item)
 
         return redirect(request.META.get('HTTP_REFERER', 'fallback_url'))
     return HttpResponse('Invalid Request', status=400)

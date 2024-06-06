@@ -22,7 +22,7 @@
     <div class="row mt-5" style="width: 95%; margin: auto;">
         <div class="col-12 col-sm-6 col-md-3 border" id="input_section">
             <h2 class="mb-4">Input Dimensions</h2>
-            <form id="panelForm" method="post">
+            <form action="{% url 'bin_packing:receive_panels' %}" id="panelForm" method="post">
                 {% csrf_token %}
                 <table class="table" id="panelTable">
                     <thead>

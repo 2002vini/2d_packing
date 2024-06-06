@@ -11,6 +11,14 @@ def plot_graph(rectangles, num, algo, heuristic):
     ax.set_xlim(0, 138)
     ax.set_ylim(0, 78)
     ax.set_title(f'Graph: {num}')
+    ax.set_xlabel("Width")
+    ax.set_ylabel("Height")
+    ax.set_aspect('equal', adjustable='box')
+
+    ax.autoscale(enable=False)
+
+    ax.set_xticks([i for i in range(0, 139, 20)] + [138])
+    ax.set_yticks([i for i in range(0, 79, 10)] + [78])
 
     margin = 1
 
@@ -20,17 +28,15 @@ def plot_graph(rectangles, num, algo, heuristic):
         ax.add_patch(patch)
 
         # Annotate width inside the rectangle with margin
-        ax.text(rect['x'] + rect['width']/2, rect['y'] + margin, f"{rect['width']}", 
-                verticalalignment='bottom', horizontalalignment='center', 
+        ax.text(rect['x'] + rect['width']/2, rect['y'] + margin, f"{rect['width']}",
+                verticalalignment='bottom', horizontalalignment='center',
                 fontsize=8, color='black', weight='bold')
 
         # Annotate height inside the rectangle with margin
-        ax.text(rect['x'] + margin, rect['y'] + rect['height']/2, f"{rect['height']}", 
-                verticalalignment='center', horizontalalignment='left', 
+        ax.text(rect['x'] + margin, rect['y'] + rect['height']/2, f"{rect['height']}",
+                verticalalignment='center', horizontalalignment='left',
                 fontsize=8, color='black', weight='bold', rotation=90)
 
-    # Set aspect of the plot to be equal
-    ax.set_aspect('equal', adjustable='box')
 
     # Check if the directory exists, create if not
     BASE_DIR = Path(__file__).resolve().parent.parent

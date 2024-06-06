@@ -3,9 +3,10 @@ import matplotlib.patches as patches
 import greedypacker as g
 import csv
 import os
+from pathlib import Path
 
 
-def plotGraph(rectangles, num, algo, heuristic):
+def plot_graph(rectangles, num, algo, heuristic):
     fig, ax = plt.subplots(figsize=(10, 8))
     ax.set_xlim(0, 138)
     ax.set_ylim(0, 78)
@@ -31,9 +32,10 @@ def plotGraph(rectangles, num, algo, heuristic):
     # Set aspect of the plot to be equal
     ax.set_aspect('equal', adjustable='box')
 
-
     # Check if the directory exists, create if not
-    directory_path = f'{os.getcwd()}/plots/{algo}/{heuristic}/'
+    BASE_DIR = Path(__file__).resolve().parent.parent
+    directory_path = f'{BASE_DIR}/media/{algo}/{heuristic}/'
+
     if not os.path.exists(directory_path):
         os.makedirs(directory_path)
 
@@ -47,11 +49,10 @@ def plotGraph(rectangles, num, algo, heuristic):
 
 if __name__ == '__main__':
     algorithms = {
-
-                    'maximal_rectangle': ['best_area', 'best_shortside', 'best_longside', 'worst_area', 'worst_shortside', 'worst_longside', 'bottom_left', 'contact_point'], 
-                    # 'guillotine': ['best_area', 'best_shortside', 'best_longside', 'worst_area', 'worst_shortside', 'worst_longside'], 
-                    # 'skyline': ['bottom_left', 'best_fit']
-                }
+        'maximal_rectangle': ['best_area', 'best_shortside', 'best_longside', 'worst_area', 'worst_shortside', 'worst_longside', 'bottom_left', 'contact_point'],
+        # 'guillotine': ['best_area', 'best_shortside', 'best_longside', 'worst_area', 'worst_shortside', 'worst_longside'],
+        # 'skyline': ['bottom_left', 'best_fit']
+    }
 
     for algo in algorithms:
         for heuristic in algorithms[algo]:
@@ -59,7 +60,10 @@ if __name__ == '__main__':
             
             demoList = []    
             total_tiles = 0
-            with open('../static/csv/tiles_data_4.csv', mode='r') as file:
+            BASE_DIR = Path(__file__).resolve().parent.parent
+            filepath = f'{BASE_DIR}/static/csv/tiles_data_4.csv'
+
+            with open(filepath, mode='r') as file:
                 csv_reader = csv.DictReader(file)
                 for row in csv_reader:
                     height = float(row['height'])
@@ -76,28 +80,25 @@ if __name__ == '__main__':
             # print(f"Algo: {algo}, Heuristic: {heuristic}, Total Tiles: {total_tiles}, Bins: {len(M.bins)}")
             print(f"Algo: {algo}, Heuristic: {heuristic}, Total Tiles: {total_tiles}")
 
-            
-            
-            plots=[]
-            area_occupied=0
-            total_area=0
+            plots = []
+            area_occupied = 0
+            total_area = 0
             for bin in M.bins:
                 plotList = []
                 for item in bin.items:
                     plotList.append({"width": item.width, "height": item.height, "x": item.x, "y":item.y})
-                    area_occupied+=item.area
+                    area_occupied += item.area
                 plots.append(plotList)
-                total_area+=(138*78)
+                total_area += (138*78)
             
             percentage_occupied = (area_occupied / total_area) * 100
             percentage_wasted = 100 - percentage_occupied
             print(f"Area Occupied: {area_occupied}, Total Area: {total_area}, Percentage Occupied: {round(percentage_occupied, 3)}%, Percentage Wasted: {round(percentage_wasted, 3)}%")
 
-
-           
-            # for plot in plots:
-            #     plotGraph(plot,count, algo, heuristic)
-            #     count+=1
+            count = 0
+            for plot in plots:
+                plot_graph(plot, count, algo, heuristic)
+                count += 1
 
 
 

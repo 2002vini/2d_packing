@@ -17,6 +17,12 @@ def receive_panels(request):
                   for length, width, quantity in zip(lengths, widths, quantities)]
 
         result = custom_data_input(inventory_data=inventory_data, upload_type='manual', algo='maximal_rectangle', heuristic='best_area')
-        print(result)
-        return render(request, 'index.html', {'result': result})
+        global_area_percentage = result['global_total_area'] / (result['slab_total_area'] * result['total_bins_used']) * 100
+        global_waste_area_percentage = 100 - global_area_percentage
+
+        context = {}
+        context['result'] = result
+        context['global_area_percentage'] = round(global_area_percentage, 2)
+        context['global_waste_area_percentage'] = round(global_waste_area_percentage)
+        return render(request, 'index.html', context)
     return HttpResponse('Invalid Request', status=400)

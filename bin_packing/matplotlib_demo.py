@@ -91,7 +91,7 @@ def custom_data_input(upload_type, algo, heuristic, inventory_data=None, filenam
     plots = []
     total_bins_used = len(M.bins)
     slab_total_area = SLAB_LENGTH * SLAB_WIDTH
-    global_total_area = SLAB_LENGTH * SLAB_WIDTH * total_bins_used
+    global_total_area_used = 0
     for bin in M.bins:
         slab_details = {}
         plotList = []
@@ -99,7 +99,7 @@ def custom_data_input(upload_type, algo, heuristic, inventory_data=None, filenam
         for rectangle in bin.items:
             area_occupied += rectangle.area
             plotList.append({"width": rectangle.width, "height": rectangle.height, "x": rectangle.x, "y": rectangle.y})
-
+        global_total_area_used += area_occupied
         percentage_occupied = round((area_occupied / slab_total_area) * 100, 3)
         slab_details['slab_percentage_occupied'] = percentage_occupied
         slab_details['slab_percentage_wasted'] = round(100 - percentage_occupied, 3)
@@ -110,7 +110,7 @@ def custom_data_input(upload_type, algo, heuristic, inventory_data=None, filenam
         'plots': plots,
         'total_bins_used': total_bins_used,
         'slab_total_area': slab_total_area,
-        'global_total_area': global_total_area
+        'global_total_area': global_total_area_used
     }
 
 

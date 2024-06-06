@@ -13,7 +13,7 @@ def plot_graph(slab_data, num, algo, heuristic, total_bins_used):
     fig, ax = plt.subplots(figsize=(10, 8))
     ax.set_xlim(0, SLAB_LENGTH)
     ax.set_ylim(0, SLAB_WIDTH)
-    ax.set_title(f'Graph: {num}')
+    ax.set_title(f'Graph: {num}/{total_bins_used}')
     ax.set_xlabel("Width")
     ax.set_ylabel("Length")
     ax.set_aspect('equal', adjustable='box')

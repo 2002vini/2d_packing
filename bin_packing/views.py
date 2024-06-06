@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from bin_packing.matplotlib_demo import custom_data_input
 
 
 def index(request):
@@ -12,11 +13,10 @@ def receive_panels(request):
         widths = request.POST.getlist('width[]')
         quantities = request.POST.getlist('quantity[]')
         
-        panels = [{'length': float(length), 'width': float(width), 'quantity': int(quantity)}
+        inventory_data = [{'length': float(length), 'width': float(width), 'quantity': int(quantity)}
                   for length, width, quantity in zip(lengths, widths, quantities)]
 
-        for item in panels:
-            print(item)
-
-        return redirect(request.META.get('HTTP_REFERER', 'fallback_url'))
+        result = custom_data_input(inventory_data=inventory_data, upload_type='manual', algo='maximal_rectangle', heuristic='best_area')
+        print(result)
+        return render(request, 'index.html', {'result': result})
     return HttpResponse('Invalid Request', status=400)

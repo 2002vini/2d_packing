@@ -35,9 +35,9 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td><input type="number" name="length[]" class="form-control" min="0" required></td>
-                            <td><input type="number" name="width[]" class="form-control" min="0" required></td>
-                            <td><input type="number" name="quantity[]" class="form-control" min="0" required></td>
+                            <td><input type="number" name="length[]" class="form-control" min="0" step="any" required></td>
+                            <td><input type="number" name="width[]" class="form-control" min="0" step="any" required></td>
+                            <td><input type="number" name="quantity[]" class="form-control" min="0" step="any" required></td>
                             <td><button type="button" class="btn btn-primary addRow">+</button></td>
                         </tr>
                     </tbody>
@@ -69,7 +69,7 @@
                             </div>
                             <div class="row">
                                 <div class="col">Total Bins Used</div>
-                                <div class="col text-center">10</div>
+                                <div class="col text-center">{{ total_bins_used }}</div>
                             </div>
                         </div>
                     </div>
@@ -95,6 +95,7 @@
                 </div>
             </div>
         </div>
+    </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script>
@@ -105,9 +106,9 @@
                 if (event.target.classList.contains('addRow')) {
                     const newRow = document.createElement('tr');
                     newRow.innerHTML = `
-                        <td><input type="number" name="length[]" class="form-control" min="0" required></td>
-                        <td><input type="number" name="width[]" class="form-control" min="0" required></td>
-                        <td><input type="number" name="quantity[]" class="form-control" min="0" required></td>
+                        <td><input type="number" name="length[]" class="form-control" min="0" step="any" required></td>
+                        <td><input type="number" name="width[]" class="form-control" min="0" step="any" required></td>
+                        <td><input type="number" name="quantity[]" class="form-control" min="0" step="any" required></td>
                         <td><button type="button" class="btn btn-danger removeRow">-</button></td>
                     `;
                     tableBody.appendChild(newRow);

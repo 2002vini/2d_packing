@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -20,7 +21,8 @@
 </head>
 <body>
     <div class="row mt-5" style="width: 95%; margin: auto;">
-        <div class="col-12 col-sm-6 col-md-3 border" id="input_section">
+        <!-- INVENTORY INPUT SECTION -->
+        <div class="col-12 col-sm-6 col-md-3" id="input_section">
             <h2 class="mb-4">Input Dimensions</h2>
             <form action="{% url 'bin_packing:receive_panels' %}" id="panelForm" method="post">
                 {% csrf_token %}
@@ -45,10 +47,14 @@
                 <button type="submit" class="btn btn-success">Submit</button>
             </form>
         </div>
-        <div class="col-12 col-sm-6 border text-center" id="graph_section">
-            <div id="bin"><svg></svg></div>
+
+        <!-- GRAPH PLOT SECTION -->
+        <div class="col-12 col-sm-6 text-center" id="graph_section">
+            <!-- Dynamic SVGs will be appended here -->
         </div>
-        <div class="col-12 col-sm-6 col-md-3 border" id="results_section">
+
+        <!-- RESULTS DISPLAY SECTION -->
+        <div class="col-12 col-sm-6 col-md-3" id="results_section">
             <h2 class="mmb-4">Results:</h2>
             <div class="accordion" id="accordionPanelsStayOpenExample">
                 <div class="accordion-item">
@@ -61,15 +67,15 @@
                         <div class="accordion-body">
                             <div class="row">
                                 <div class="col">Total Area Occupied</div>
-                                <div class="col text-center">90</div>
+                                <div class="col text-center">{{ global_area_percentage }}%</div>
                             </div>
                             <div class="row">
                                 <div class="col">Total Area Wasted</div>
-                                <div class="col text-center">90</div>
+                                <div class="col text-center">{{ global_waste_area_percentage }}%</div>
                             </div>
                             <div class="row">
                                 <div class="col">Total Bins Used</div>
-                                <div class="col text-center">{{ total_bins_used }}</div>
+                                <div class="col text-center">{{ result.total_bins_used }}</div>
                             </div>
                         </div>
                     </div>
@@ -84,11 +90,11 @@
                         <div class="accordion-body">
                             <div class="row">
                                 <div class="col">Area Occupied</div>
-                                <div class="col text-center">90</div>
+                                <div class="col text-center">--</div>
                             </div>
                             <div class="row">
                                 <div class="col">Area Wasted</div>
-                                <div class="col text-center">90</div>
+                                <div class="col text-center">--</div>
                             </div>
                         </div>
                     </div>
@@ -96,67 +102,62 @@
             </div>
         </div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const tableBody = document.querySelector('#panelTable tbody');
-            
-            tableBody.addEventListener('click', function(event) {
-                if (event.target.classList.contains('addRow')) {
-                    const newRow = document.createElement('tr');
-                    newRow.innerHTML = `
-                        <td><input type="number" name="length[]" class="form-control" min="0" step="any" required></td>
-                        <td><input type="number" name="width[]" class="form-control" min="0" step="any" required></td>
-                        <td><input type="number" name="quantity[]" class="form-control" min="0" step="any" required></td>
-                        <td><button type="button" class="btn btn-danger removeRow">-</button></td>
-                    `;
-                    tableBody.appendChild(newRow);
-                } else if (event.target.classList.contains('removeRow')) {
-                    const row = event.target.parentNode.parentNode;
-                    row.parentNode.removeChild(row);
-                }
+    <script src="{% static 'js/script.js' %}"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const result = {{ result|safe }}; // Django template rendering the data safely
+    const data = result['plots'];
+
+    data.forEach((plot, index) => {
+        // Create a container for each plot
+        const plotContainer = document.createElement('div');
+        plotContainer.className = 'plot-container';
+        plotContainer.style.margin = '20px 0';
+        plotContainer.style.border = '1px solid #ccc';
+        plotContainer.style.padding = '0';
+
+        // Create SVG element for each plot
+        const svgContainer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svgContainer.setAttribute("viewBox", "0 0 138 78"); // Set the view box based on slab dimensions
+        plotContainer.appendChild(svgContainer);
+
+        // Add rectangles to the SVG
+        plot.rectangles.forEach(rect => {
+            const rectElem = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            rectElem.setAttribute("x", rect.x);
+            rectElem.setAttribute("y", 78 - rect.y - rect.height); // Invert y-axis calculation
+            rectElem.setAttribute("width", rect.width);
+            rectElem.setAttribute("height", rect.height);
+            rectElem.setAttribute("fill", "#add8e6"); // Light blue fill
+            // Remove the stroke attribute to eliminate borders
+            svgContainer.appendChild(rectElem);
+
+            // Tooltip on hover
+            const tooltip = document.createElement("div");
+            rectElem.addEventListener('mouseover', function(event) {
+                tooltip.textContent = `Width: ${rect.width}, Height: ${rect.height}`;
+                tooltip.style.position = 'absolute';
+                tooltip.style.left = `${event.pageX + 10}px`;
+                tooltip.style.top = `${event.pageY + 10}px`;
+                tooltip.style.padding = '5px';
+                tooltip.style.background = 'white';
+                tooltip.style.border = '1px solid black';
+                tooltip.style.zIndex = '1000';
+                document.body.appendChild(tooltip);
+            });
+            rectElem.addEventListener('mouseout', function() {
+                document.body.removeChild(tooltip);
             });
         });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const svgContainer = document.querySelector('#bin svg');
 
-            // Example rectangles data
-            const rectangles = [
-                {width: 98.25, height: 31.75, x: 0, y: 0}, 
-                {width: 38.0, height: 72.0, x: 98.25, y: 0}, 
-                {width: 72.0, height: 38.0, x: 0, y: 31.75}, 
-                {width: 25.0, height: 45.0, x: 72.0, y: 31.75}
-            ];
+        // Append each plot container to the main section
+        document.querySelector('#graph_section').appendChild(plotContainer);
+    });
+});
+</script>
 
-            rectangles.forEach(rect => {
-                const rectElem = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                rectElem.setAttribute("x", rect.x * 5); // scaling factor for display
-                rectElem.setAttribute("y", (78 - rect.y - rect.height) * 5); // invert y for bottom-left origin
-                rectElem.setAttribute("width", rect.width * 5);
-                rectElem.setAttribute("height", rect.height * 5);
-                rectElem.setAttribute("fill", "#add8e6"); // Default fill color
-                svgContainer.appendChild(rectElem);
-
-                // Tooltip on hover
-                const tooltip = document.createElement("div");
-                rectElem.addEventListener('mouseover', function(event) {
-                    tooltip.textContent = `Width: ${rect.width}, Height: ${rect.height}`;
-                    tooltip.style.position = 'absolute';
-                    tooltip.style.left = `${event.pageX}px`;
-                    tooltip.style.top = `${event.pageY}px`;
-                    tooltip.style.padding = '5px';
-                    tooltip.style.background = 'white';
-                    tooltip.style.border = '1px solid black';
-                    document.body.appendChild(tooltip);
-                });
-                rectElem.addEventListener('mouseout', function() {
-                    document.body.removeChild(tooltip);
-                });
-            });
-        });
-    </script>
 </body>
 </html>

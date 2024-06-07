@@ -1,3 +1,4 @@
+import json
 from django.http import HttpResponse
 from django.shortcuts import render
 from bin_packing.models import Panel
@@ -23,12 +24,13 @@ def index(request):
                 result = custom_data_input(inventory_data=inventory_data, upload_type='manual', algo='maximal_rectangle',
                                            heuristic='best_area', slab_l=float(slab_length), slab_w=float(slab_width))
 
+
             elif inventory_input_type == 'csv':
                 csv_file = request.FILES.get('csv_file')
                 result = custom_data_input(upload_type='csv', algo='maximal_rectangle', heuristic='best_area',
                                            filename=csv_file, slab_l=float(slab_length), slab_w=float(slab_width))
 
-                panel_obj = Panel.objects.create(csv_file=csv_file)
+                panel_obj = Panel.objects.create(csv_file=csv_file, json_file=json.dumps(result))
                 context['uploaded_csv_file_id'] = panel_obj.id
 
             global_total_area_percentage = result['global_total_area_used'] / (result['slab_total_area'] * result['total_bins_used']) * 100
@@ -50,15 +52,20 @@ def index(request):
 
 
 def zip_file_handle(request):
+    algo = 'maximal_rectangle'
+    heuristic = 'best_area'
     if request.method == 'POST':
         csv_file_id = request.POST.get('uploaded_csv_file_id')
-
         csv_file_obj = Panel.objects.filter(id=csv_file_id)
         if csv_file_obj.exists():
             obj = csv_file_obj[0]
-            csv_file_path = obj.csv_file.url
-            print(csv_file_path)
-            # plot_graph()
+            data = json.loads(obj.json_file)
+            csv_file_path = obj.csv_file.path
+            count = 0
+            for slab_data in data['plots']:
+                plot_graph(slab_data, count, algo, heuristic, data['total_bins_used'], csv_file_path)
+                count += 1
+
             return HttpResponse('SUCCESS', status=200)
         return HttpResponse('Error: Requested csv file doesn\'t exists', status=400)
 

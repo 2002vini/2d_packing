@@ -9,11 +9,11 @@ SLAB_LENGTH = 138
 SLAB_WIDTH = 78
 
 
-def plot_graph(slab_data, num, algo, heuristic, total_bins_used):
+def plot_graph(slab_data, num, algo, heuristic, total_bins_used, csv_file_path):
     fig, ax = plt.subplots(figsize=(10, 8))
     ax.set_xlim(0, SLAB_LENGTH)
     ax.set_ylim(0, SLAB_WIDTH)
-    ax.set_title(f'Graph: {num+1}/{total_bins_used}')
+    ax.set_title(f'Layout: {num+1}/{total_bins_used}')
     ax.set_xlabel("Width")
     ax.set_ylabel("Length")
     ax.set_aspect('equal', adjustable='box')
@@ -41,14 +41,14 @@ def plot_graph(slab_data, num, algo, heuristic, total_bins_used):
                 fontsize=8, color='black', weight='bold', rotation=90)
 
     # Display additional statistics
-    stats_text = f"Total bins used: {total_bins_used}\nArea occupied: {slab_data['slab_percentage_occupied']}%\nArea wasted: {slab_data['slab_percentage_wasted']}%"
+    stats_text = f"Total bins used: {total_bins_used}\nArea occupied: {slab_data['slab_percentage_occupied']}%\nArea wasted: {slab_data['slab_percentage_wasted']}%\nLayout Count: {slab_data['layout_count']}"
     props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
     fig.text(0.5, 0.07, stats_text, ha='center', va='bottom', fontsize=10, bbox=props)
     fig.subplots_adjust(bottom=0.2)  # Increase the bottom margin
 
     # Check if the directory exists, create if not and save the image
     ROOT_DIR = Path(__file__).resolve().parent.parent
-    directory_path = f'{ROOT_DIR}/media/{algo}/{heuristic}/'
+    directory_path = f'{ROOT_DIR}/{csv_file_path}/'
     if not os.path.exists(directory_path):
         os.makedirs(directory_path)
     image_name = f"image_{num+1}.png"

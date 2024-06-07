@@ -29,8 +29,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 submitButton.disabled = false;
                 Swal.fire({
                     title: 'Success!',
-                    text: 'File Uploaded Successfully.',
+                    text: 'File Imported Successfully.',
                     icon: 'success'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        submitButton.click();
+                    }
                 })
             }
             else{
@@ -52,3 +56,25 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+
+document.addEventListener('DOMContentLoaded', function() {
+    let manual_slab_length = document.getElementById('manual_slab_length')
+    let manual_slab_width = document.getElementById('manual_slab_width')
+    let csv_slab_length = document.getElementById('csv_slab_length')
+    let csv_slab_width = document.getElementById('csv_slab_width')
+
+    let slab_length = document.getElementById('slab_length')
+    let slab_width = document.getElementById('slab_width')
+
+    slab_length.addEventListener('input', ()=>{
+        let slab_length_value = slab_length.value
+        manual_slab_length.value = slab_length_value
+        csv_slab_length.value = slab_length_value
+    })
+
+    slab_width.addEventListener('input', ()=>{
+        let slab_width_value = slab_width.value
+        manual_slab_width.value = slab_width_value
+        csv_slab_width.value = slab_width_value
+    })
+});

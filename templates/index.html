@@ -27,7 +27,7 @@
         <div class="col-12 col-sm-6 col-md-3" id="input_section">
             <div class="mb-5">
                 <h3 class="mb-3">Input Tiles Dimensions</h3>
-                <form action="{% url 'bin_packing:receive_panels' %}" id="panelForm" method="post">
+                <form action="{% url 'bin_packing:index' %}" id="panelForm" method="post">
                     {% csrf_token %}
                     <input type="hidden" name="inventory_input_type" value="manual">
                     <input type="hidden" name="slab_length" id="manual_slab_length" value="{% if slab_l %}{{ slab_l }}{% else %}138{% endif %}">
@@ -55,13 +55,12 @@
             </div>
             <div class="mb-5">
                 <h3>Import File</h3>
-                <form action="{% url 'bin_packing:receive_panels' %}" method="post" enctype="multipart/form-data">
+                <form action="{% url 'bin_packing:index' %}" id="csv_upload_form" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <input type="hidden" name="inventory_input_type" value="csv">
                     <input type="hidden" name="slab_length" id="csv_slab_length" value="{% if slab_l %}{{ slab_l }}{% else %}138{% endif %}">
                     <input type="hidden" name="slab_width" id="csv_slab_width" value="{% if slab_w %}{{ slab_w }}{% else %}78{% endif %}">
                     <input class="form-control mb-3" name="csv_file" id="csv_file_input" type="file">
-                    <button class="btn btn-success" id="csv_file_submit_btn" disabled>Submit</button>
                 </form>
             </div>
             <div class="mb-5">
@@ -77,14 +76,20 @@
                         <tr>
                             <td><input class="form-control" name="slab_length" id="slab_length" type="number" value="{% if slab_l %}{{ slab_l }}{% else %}138{% endif %}" min="0"></td>
                             <td><input class="form-control" name="slab_width" id="slab_width" type="number" value="{% if slab_w %}{{ slab_w }}{% else %}78{% endif %}" min="0"></td>
-                        </tr>
+                        </tr>show_statistics
                     </tbody>
                 </table>
             </div>
-            <div class="mb-5">
-                <h3>Download Zip File</h3>
-                <a href="" class="btn btn-success disabled" target="_blank" ><i class="fa-solid fa-upload"></i> Download</a>
-            </div>
+            {% if uploaded_csv_file_id %}
+                <div class="mb-5">
+                    <h3>Download Zip File</h3>
+                    <form method="post" action="{% url 'bin_packing:zip_file_handle' %}">
+                        {% csrf_token %}
+                        <input type="hidden" id="uploaded_csv_file_id" name="uploaded_csv_file_id" value="{{ uploaded_csv_file_id }}">
+                        <button class="btn btn-success" type="submit">Download</button>
+                    </form>
+                </div>
+            {% endif %}
         </div>
 
         <!-- GRAPH PLOT SECTION -->
@@ -93,6 +98,7 @@
         </div>
 
         <!-- RESULTS DISPLAY SECTION -->
+        {% if show_statistics %}
         <div class="col-12 col-sm-6 col-md-3" id="results_section">
             <h2 class="mb-4">Statistics</h2>
             <div class="card mb-3">
@@ -167,6 +173,7 @@
                 </div>
             </div>
         </div>
+        {% endif %}
     </div>
 {% endblock %}
 

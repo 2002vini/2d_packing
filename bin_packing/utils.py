@@ -110,24 +110,24 @@ def custom_data_input(upload_type, algo, heuristic, inventory_data=None, filenam
 
     for config, count in slab_configurations.items():
         slab_details = {}
-        plotList = [{'width': rect[0], 'height': rect[1], 'x': rect[2], 'y': rect[3]} for rect in config]
+        plotList = [{"width": rect[0], "height": rect[1], "x": rect[2], "y": rect[3]} for rect in config]
         area_occupied = sum(rect[0] * rect[1] for rect in config)
         global_total_area_used += area_occupied * count
         percentage_occupied = round((area_occupied / slab_total_area) * 100, 3)
 
-        slab_details['slab_percentage_occupied'] = percentage_occupied
-        slab_details['slab_percentage_wasted'] = round(100 - percentage_occupied, 3)
-        slab_details['rectangles'] = plotList
-        slab_details['layout_count'] = count
-        slab_details['slab_used_area'] = round(area_occupied, 2)
-        slab_details['slab_wasted_area'] = round(slab_total_area - area_occupied, 2)
+        slab_details["slab_percentage_occupied"] = percentage_occupied
+        slab_details["slab_percentage_wasted"] = round(100 - percentage_occupied, 3)
+        slab_details["rectangles"] = plotList
+        slab_details["layout_count"] = count
+        slab_details["slab_used_area"] = round(area_occupied, 2)
+        slab_details["slab_wasted_area"] = round(slab_total_area - area_occupied, 2)
         plots.append(slab_details)
 
     return {
-        'plots': plots,
-        'total_bins_used': len(M.bins),
-        'slab_total_area': slab_total_area,
-        'global_total_area_used': global_total_area_used
+        "plots": plots,
+        "total_bins_used": len(M.bins),
+        "slab_total_area": slab_total_area,
+        "global_total_area_used": global_total_area_used
     }
 
 
@@ -147,7 +147,6 @@ def custom_data_input(upload_type, algo, heuristic, inventory_data=None, filenam
 #             for slab_data in result['plots']:
 #                 plot_graph(slab_data, count, algo, heuristic, result['total_bins_used'])
 #                 count += 1
-#
 
 
 # *** ACTUAL ANSWERS ***

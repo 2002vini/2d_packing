@@ -16,4 +16,39 @@ document.addEventListener('DOMContentLoaded', function() {
             row.parentNode.removeChild(row);
         }
     });
+
+    // Import CSV file validation
+    document.getElementById('csv_file_input').addEventListener('change', function() {
+        let fileInput = this;
+        let submitButton = document.getElementById('csv_file_submit_btn');
+
+        // Check if any file is selected and if it is a CSV file
+        if (fileInput.files.length > 0) {
+            let fileType = fileInput.files[0].type;
+            if(fileType === "text/csv" || fileType === "application/vnd.ms-excel"){
+                submitButton.disabled = false;
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'File Uploaded Successfully.',
+                    icon: 'success'
+                })
+            }
+            else{
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Only CSV Files Supported.',
+                    icon: 'error'
+                })
+                submitButton.disabled = true;
+            }
+        } else {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Please Upload a file first.',
+                icon: 'error'
+            })
+            submitButton.disabled = true;
+        }
+    });
 });
+

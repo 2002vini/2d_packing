@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bin_packing.apps.BinPackingConfig',
-    'jazzmin',
 ]
 
 MIDDLEWARE = [
@@ -144,22 +144,22 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Django Jazzmin Settings
 JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
-    "site_title": "Solvify Hub Admin",
+    "site_title": "Admin",
 
     # Title on the login screen (19 chars max) (defaults to current_admin_site.site_header if absent or None)
-    "site_header": "Solvify Hub",
+    "site_header": "Inani Marbles",
 
     # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
-    "site_brand": "SolvifyHub",
+    "site_brand": "Inani Marbles",
 
     # Logo to use for your site, must be present in static files, used for brand on top left
-    "site_logo": "Logos/Logo-white.png",
+    "site_logo": "img/tiger_logo.png",
 
     # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
-    "login_logo": "Logos/Logo-black.png",
+    "login_logo": "img/tiger_logo.png",
 
     # Logo to use for login form in dark themes (defaults to login_logo)
-    "login_logo_dark": "Logos/Logo-black.png",
+    "login_logo_dark": "img/tiger_logo.png",
 
     # CSS classes that are applied to the logo above
     "site_logo_classes": "",
@@ -168,10 +168,10 @@ JAZZMIN_SETTINGS = {
     "site_icon": None,
 
     # Welcome text on the login screen
-    "welcome_sign": "Welcome to the Solvify Hub",
+    "welcome_sign": "Welcome to the Inani Marbles",
 
     # Copyright on the footer
-    "copyright": "Solvify Hub, 2024",
+    "copyright": "Inani Marbles and Industries LTD., 2024",
 
     # List of model admins to search from the search bar, search bar omitted if excluded
     # If you want to use a single search field you dont need to use a list, you can use a simple string

@@ -26,14 +26,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (fileInput.files.length > 0) {
             let fileType = fileInput.files[0].type;
             if(fileType === "text/csv" || fileType === "application/vnd.ms-excel"){
-                submitButton.disabled = false;
                 Swal.fire({
                     title: 'Success!',
                     text: 'File Imported Successfully.',
                     icon: 'success'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        submitButton.click();
+                        document.getElementById('csv_upload_form').submit();
                     }
                 })
             }
@@ -43,7 +42,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     text: 'Only CSV Files Supported.',
                     icon: 'error'
                 })
-                submitButton.disabled = true;
             }
         } else {
             Swal.fire({
@@ -51,7 +49,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 text: 'Please Upload a file first.',
                 icon: 'error'
             })
-            submitButton.disabled = true;
         }
     });
 });

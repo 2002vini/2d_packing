@@ -60,6 +60,10 @@
                     <button class="btn btn-success" id="csv_file_submit_btn" disabled>Submit</button>
                 </form>
             </div>
+            <div class="mb-5">
+                <h3>Download Zip File</h3>
+                <a href="" class="btn btn-success disabled" target="_blank" ><i class="fa-solid fa-upload"></i> Download</a>
+            </div>
         </div>
 
         <!-- GRAPH PLOT SECTION -->
@@ -69,23 +73,35 @@
 
         <!-- RESULTS DISPLAY SECTION -->
         <div class="col-12 col-sm-6 col-md-3" id="results_section">
-            <h2 class="mb-4">Results:</h2>
+            <h2 class="mb-4">Statistics</h2>
             <div class="card mb-3">
                 <div class="card-header">
                     Global Statistics
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col">Total Area Occupied</div>
-                        <div class="col text-center">{{ global_area_percentage }}%</div>
+                        <div class="col">Total area used</div>
+                        <div class="col">{{ result.global_total_area_used }}</div>
                     </div>
                     <div class="row">
-                        <div class="col">Total Area Wasted</div>
-                        <div class="col text-center">{{ global_waste_area_percentage }}%</div>
+                        <div class="col">Total area used (%)</div>
+                        <div class="col">{{ global_area_percentage }}%</div>
                     </div>
                     <div class="row">
-                        <div class="col">Total Bins Used</div>
-                        <div class="col text-center">{{ result.total_bins_used }}</div>
+                        <div class="col">Total area wasted</div>
+                        <div class="col">{{ global_total_area_wasted }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col">Total area wasted (%)</div>
+                        <div class="col">{{ global_waste_area_percentage }}%</div>
+                    </div>
+                    <div class="row">
+                        <div class="col">Total no of slabs used</div>
+                        <div class="col">{{ result.total_bins_used }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col">Total area of single slab</div>
+                        <div class="col">{{ result.slab_total_area }}</div>
                     </div>
                 </div>
             </div>
@@ -100,12 +116,20 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col">Area Occupied</div>
-                        <div class="col text-center">--</div>
+                        <div class="col">Area occupied</div>
+                        <div class="col">--</div>
                     </div>
                     <div class="row">
-                        <div class="col">Area Wasted</div>
-                        <div class="col text-center">--</div>
+                        <div class="col">Area occupied (%)</div>
+                        <div class="col">--</div>
+                    </div>
+                    <div class="row">
+                        <div class="col">Area wasted</div>
+                        <div class="col">--</div>
+                    </div>
+                    <div class="row">
+                        <div class="col">Area wasted (%)</div>
+                        <div class="col">--</div>
                     </div>
                 </div>
             </div>
@@ -150,7 +174,7 @@
                     // Tooltip on hover
                     const tooltip = document.createElement("div");
                     rectElem.addEventListener('mouseover', function(event) {
-                        tooltip.textContent = `Width: ${rect.width}, Height: ${rect.height}`;
+                        tooltip.innerHTML = `Width: ${rect.width} <br>Height: ${rect.height} <br>Area: ${rect.width * rect.height}`;
                         tooltip.style.position = 'absolute';
                         tooltip.style.left = `${event.pageX + 10}px`;
                         tooltip.style.top = `${event.pageY + 10}px`;

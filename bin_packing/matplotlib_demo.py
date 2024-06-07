@@ -80,6 +80,9 @@ def custom_data_input(upload_type, algo, heuristic, inventory_data=None, filenam
                     height = float(item['length'])
                     width = float(item['width'])
                     quantity = int(item['quantity'])
+                    # code = int(item['code'])
+                    # polish_edge_l = int(item['polish_edge_l'])
+                    # polish_edge_w = int(item['polish_edge_w'])
 
                     for _ in range(int(quantity)):
                         demoList.append(g.Item(height, width))
@@ -110,27 +113,27 @@ def custom_data_input(upload_type, algo, heuristic, inventory_data=None, filenam
         'plots': plots,
         'total_bins_used': total_bins_used,
         'slab_total_area': slab_total_area,
-        'global_total_area': global_total_area_used
+        'global_total_area_used': global_total_area_used
     }
 
 
-if __name__ == '__main__':
-    algorithms = {
-        'maximal_rectangle': ['best_area'],
-        # 'maximal_rectangle': ['best_area', 'best_shortside', 'best_longside', 'worst_area', 'worst_shortside', 'worst_longside', 'bottom_left', 'contact_point'],
-        # 'guillotine': ['best_area', 'best_shortside', 'best_longside', 'worst_area', 'worst_shortside', 'worst_longside'],
-        # 'skyline': ['bottom_left', 'best_fit']
-    }
-
-    for algo in algorithms:
-        for heuristic in algorithms[algo]:
-            result = custom_data_input('csv', algo, heuristic, [], 'tiles_data_4.csv')
-
-            count = 0
-            for slab_data in result['plots']:
-                plot_graph(slab_data, count, algo, heuristic, result['total_bins_used'])
-                count += 1
-
+# if __name__ == '__main__':
+#     algorithms = {
+#         'maximal_rectangle': ['best_area'],
+#         # 'maximal_rectangle': ['best_area', 'best_shortside', 'best_longside', 'worst_area', 'worst_shortside', 'worst_longside', 'bottom_left', 'contact_point'],
+#         # 'guillotine': ['best_area', 'best_shortside', 'best_longside', 'worst_area', 'worst_shortside', 'worst_longside'],
+#         # 'skyline': ['bottom_left', 'best_fit']
+#     }
+#
+#     for algo in algorithms:
+#         for heuristic in algorithms[algo]:
+#             result = custom_data_input('csv', algo, heuristic, [], 'tiles_data_4.csv')
+#
+#             count = 0
+#             for slab_data in result['plots']:
+#                 plot_graph(slab_data, count, algo, heuristic, result['total_bins_used'])
+#                 count += 1
+#
 
 
 # *** ACTUAL ANSWERS ***

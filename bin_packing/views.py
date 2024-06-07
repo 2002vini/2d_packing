@@ -1,4 +1,9 @@
 import json
+import os
+import shutil
+import zipfile
+from pathlib import Path
+from django.core.files import File
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -53,19 +58,39 @@ def index(request):
 
 
 def zip_file_handle(request):
-    algo = 'maximal_rectangle'
-    heuristic = 'best_area'
     if request.method == 'POST':
         csv_file_id = request.POST.get('uploaded_csv_file_id')
         csv_file_obj = Panel.objects.filter(id=csv_file_id)
         if csv_file_obj.exists():
-            obj = csv_file_obj[0]
-            data = json.loads(obj.json_file)
-            csv_file_path = obj.csv_file
+            csv_obj = csv_file_obj[0]
+            data = json.loads(csv_obj.json_file)
             count = 0
             for slab_data in data['plots']:
-                plot_graph(slab_data, count, algo, heuristic, data['total_bins_used'], csv_file_id, csv_file_path)
+                plot_graph(slab_data, count, data['total_bins_used'], csv_file_id)
                 count += 1
+
+            ROOT_DIR = Path(__file__).resolve().parent.parent
+            zip_filename = f'{csv_file_id}.zip'
+            folder_path = f'{ROOT_DIR}/media/{csv_file_id}'
+            zip_file_path = f'{ROOT_DIR}/media/{csv_file_id}.zip'
+
+            # Ensure the directory exists
+            os.makedirs(folder_path, exist_ok=True)
+
+            # Create zip_file of our folder
+            with zipfile.ZipFile(zip_file_path, 'w') as zipf:
+                for root, dirs, files in os.walk(folder_path):
+                    for file in files:
+                        zipf.write(os.path.join(root, file), os.path.relpath(os.path.join(root, file), os.path.join(folder_path, '..')))
+
+            # Save zip_file in our database
+            with open(zip_file_path, 'rb') as f:
+                csv_obj.zip_file.save(zip_filename, File(f), save=True)
+
+            # Remove the original folder
+            shutil.rmtree(folder_path)
+            os.remove(zip_file_path)    # remove temp zip file
+
             # messages.success(request, 'Download Successful')
             return redirect(request.META.get('HTTP_REFERER', 'fallback_url'))
         return HttpResponse('Error: Requested csv file doesn\'t exists', status=400)

@@ -9,7 +9,7 @@ SLAB_LENGTH = 138
 SLAB_WIDTH = 78
 
 
-def plot_graph(slab_data, num, algo, heuristic, total_bins_used, csv_file_id, csv_file_path):
+def plot_graph(slab_data, num, total_bins_used, csv_file_id):
     fig, ax = plt.subplots(figsize=(10, 8))
     ax.set_xlim(0, SLAB_LENGTH)
     ax.set_ylim(0, SLAB_WIDTH)
@@ -48,7 +48,7 @@ def plot_graph(slab_data, num, algo, heuristic, total_bins_used, csv_file_id, cs
 
     # Check if the directory exists, create if not and save the image
     ROOT_DIR = Path(__file__).resolve().parent.parent
-    directory_path = f'{ROOT_DIR}/media/zip_file/{csv_file_id}/'
+    directory_path = f'{ROOT_DIR}/media/{csv_file_id}/'
     if not os.path.exists(directory_path):
         os.makedirs(directory_path)
     image_name = f"image_{num+1}.png"

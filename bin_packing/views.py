@@ -1,6 +1,6 @@
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
-from bin_packing.matplotlib_demo import custom_data_input
+from django.shortcuts import render
+from bin_packing.utils import custom_data_input
 
 
 def index(request):
@@ -32,7 +32,7 @@ def receive_panels(request):
         context = {}
         context['result'] = result
         context['global_area_percentage'] = round(global_total_area_percentage, 2)
-        context['global_waste_area_percentage'] = round(global_waste_area_percentage)
+        context['global_waste_area_percentage'] = round(global_waste_area_percentage, 2)
         context['global_total_area_wasted'] = round(global_total_area_wasted, 2)
         return render(request, 'index.html', context)
 

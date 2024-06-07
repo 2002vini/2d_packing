@@ -83,10 +83,10 @@
             {% if uploaded_csv_file_id %}
                 <div class="mb-5">
                     <h3>Download Zip File</h3>
-                    <form method="post" action="{% url 'bin_packing:zip_file_handle' %}">
+                    <form method="post" action="{% url 'bin_packing:zip_file_handle' %}" id="download_csv_form">
                         {% csrf_token %}
                         <input type="hidden" id="uploaded_csv_file_id" name="uploaded_csv_file_id" value="{{ uploaded_csv_file_id }}">
-                        <button class="btn btn-success" type="submit">Download</button>
+                        <button class="btn btn-success" type="button" id="download_csv_button"> Download</button>
                     </form>
                 </div>
             {% endif %}
@@ -254,6 +254,28 @@
             // Update the sheet index display
             document.getElementById('current_layout').innerHTML = currentIndex + ' / ' + totalSheets;
         }
+    </script>
+    
+    <script>
+        document.getElementById('download_csv_button').addEventListener('click', function() {
+            let formData = new FormData(document.getElementById('download_csv_form'));
+            fetch('{% url 'bin_packing:zip_file_handle' %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.url) {
+                    window.location.href = data.url;  // This triggers the download
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
     </script>
 {% endblock %}
 

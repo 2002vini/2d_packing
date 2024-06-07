@@ -5,7 +5,7 @@ import zipfile
 from pathlib import Path
 from django.core.files import File
 from django.contrib import messages
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from bin_packing.models import Panel
 from bin_packing.utils import custom_data_input, plot_graph
@@ -92,6 +92,6 @@ def zip_file_handle(request):
             os.remove(zip_file_path)    # remove temp zip file
 
             # messages.success(request, 'Download Successful')
-            return redirect(request.META.get('HTTP_REFERER', 'fallback_url'))
+            return JsonResponse({'url': csv_obj.zip_file.url}, status=200)
         return HttpResponse('Error: Requested csv file doesn\'t exists', status=400)
 

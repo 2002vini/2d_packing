@@ -109,28 +109,32 @@
                 <div class="card-header">
                     <span class="me-4">Sheet Statistics</span>
                     <span class="">
-                        <button class="btn"><i class="fa-solid fa-less-than"></i></button>
-                        <span> 1 / {{ result.total_bins_used }} </span>
-                        <button class="btn"><i class="fa-solid fa-greater-than"></i></button>
+                        <button class="btn" onclick="sheetStatistics(-1)"><i class="fa-solid fa-less-than"></i></button>
+                        <span id="current_layout"></span>
+                        <button class="btn" onclick="sheetStatistics(1)"><i class="fa-solid fa-greater-than"></i></button>
                     </span>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col">Area occupied</div>
-                        <div class="col">--</div>
+                <div id="statisticsContent">
+                    {% for data in result.plots %}
+                    <div class="card-body" id="sheet-{{ forloop.counter }}" style="display: {% if forloop.counter == 1 %}block{% else %}none{% endif %};">
+                        <div class="row">
+                            <div class="col">Area occupied</div>
+                            <div class="col">{{ data.slab_used_area }}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col">Area occupied (%)</div>
+                            <div class="col">{{ data.slab_percentage_occupied }}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col">Area wasted</div>
+                            <div class="col">{{ data.slab_wasted_area }}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col">Area wasted (%)</div>
+                            <div class="col">{{ data.slab_percentage_wasted }}</div>
+                        </div>
                     </div>
-                    <div class="row">
-                        <div class="col">Area occupied (%)</div>
-                        <div class="col">--</div>
-                    </div>
-                    <div class="row">
-                        <div class="col">Area wasted</div>
-                        <div class="col">--</div>
-                    </div>
-                    <div class="row">
-                        <div class="col">Area wasted (%)</div>
-                        <div class="col">--</div>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -193,6 +197,27 @@
                 document.querySelector('#graph_section').appendChild(plotContainer);
             });
         });
+    </script>
+    
+    <script>
+        let currentIndex = 1;
+        let totalSheets = {{ result.total_bins_used }};
+        document.getElementById('current_layout').innerHTML = currentIndex + ' / ' + totalSheets;
+        function sheetStatistics(direction) {
+            // Hide current sheet
+            document.getElementById('sheet-' + currentIndex).style.display = 'none';
+        
+            // Calculate new index
+            currentIndex += direction;
+            if (currentIndex < 1) currentIndex = totalSheets;
+            if (currentIndex > totalSheets) currentIndex = 1;
+        
+            // Show new sheet
+            document.getElementById('sheet-' + currentIndex).style.display = 'block';
+        
+            // Update the sheet index display
+            document.getElementById('current_layout').innerHTML = currentIndex + ' / ' + totalSheets;
+        }
     </script>
 {% endblock %}
 

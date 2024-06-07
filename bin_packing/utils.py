@@ -103,9 +103,11 @@ def custom_data_input(upload_type, algo, heuristic, inventory_data=None, filenam
             area_occupied += rectangle.area
             plotList.append({"width": rectangle.width, "height": rectangle.height, "x": rectangle.x, "y": rectangle.y})
         global_total_area_used += area_occupied
-        percentage_occupied = round((area_occupied / slab_total_area) * 100, 3)
+        percentage_occupied = round((area_occupied / slab_total_area) * 100, 2)
         slab_details['slab_percentage_occupied'] = percentage_occupied
-        slab_details['slab_percentage_wasted'] = round(100 - percentage_occupied, 3)
+        slab_details['slab_percentage_wasted'] = round(100 - percentage_occupied, 2)
+        slab_details['slab_used_area'] = round(area_occupied, 2)
+        slab_details['slab_wasted_area'] = round(slab_total_area - area_occupied, 2)
         slab_details['rectangles'] = plotList
         plots.append(slab_details)
 

@@ -56,7 +56,9 @@ def plot_graph(slab_data, num, algo, heuristic, total_bins_used):
     plt.close(fig)
 
 
-def custom_data_input(upload_type, algo, heuristic, inventory_data=None, filename=None):
+def custom_data_input(upload_type, algo, heuristic, inventory_data=None, filename=None, slab_l=138, slab_w=78):
+    SLAB_LENGTH = slab_l
+    SLAB_WIDTH = slab_w
     M = g.BinManager(SLAB_LENGTH, SLAB_WIDTH, pack_algo=algo, heuristic=heuristic, rotation=True, sorting=True, wastemap=True)
     demoList = []
 

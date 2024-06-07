@@ -25,11 +25,13 @@
     <div class="row mt-3" style="width: 95%; margin: auto;">
         <!-- INVENTORY INPUT SECTION -->
         <div class="col-12 col-sm-6 col-md-3" id="input_section">
-            <h2 class="mb-4">Input Dimensions</h2>
             <div class="mb-5">
+                <h3 class="mb-3">Input Tiles Dimensions</h3>
                 <form action="{% url 'bin_packing:receive_panels' %}" id="panelForm" method="post">
                     {% csrf_token %}
                     <input type="hidden" name="inventory_input_type" value="manual">
+                    <input type="hidden" name="slab_length" id="manual_slab_length" value="{% if slab_l %}{{ slab_l }}{% else %}138{% endif %}">
+                    <input type="hidden" name="slab_width" id="manual_slab_width" value="{% if slab_w %}{{ slab_w }}{% else %}78{% endif %}">
                     <table class="table" id="panelTable">
                         <thead>
                             <tr>
@@ -56,9 +58,28 @@
                 <form action="{% url 'bin_packing:receive_panels' %}" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <input type="hidden" name="inventory_input_type" value="csv">
+                    <input type="hidden" name="slab_length" id="csv_slab_length" value="{% if slab_l %}{{ slab_l }}{% else %}138{% endif %}">
+                    <input type="hidden" name="slab_width" id="csv_slab_width" value="{% if slab_w %}{{ slab_w }}{% else %}78{% endif %}">
                     <input class="form-control mb-3" name="csv_file" id="csv_file_input" type="file">
                     <button class="btn btn-success" id="csv_file_submit_btn" disabled>Submit</button>
                 </form>
+            </div>
+            <div class="mb-5">
+                <h3>Input Slab Dimensions</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Length</th>
+                            <th>Width</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input class="form-control" name="slab_length" id="slab_length" type="number" value="{% if slab_l %}{{ slab_l }}{% else %}138{% endif %}" min="0"></td>
+                            <td><input class="form-control" name="slab_width" id="slab_width" type="number" value="{% if slab_w %}{{ slab_w }}{% else %}78{% endif %}" min="0"></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
             <div class="mb-5">
                 <h3>Download Zip File</h3>
@@ -102,6 +123,10 @@
                     <div class="row">
                         <div class="col">Total area of single slab</div>
                         <div class="col">{{ result.slab_total_area }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col">Slab Size</div>
+                        <div class="col">{{ slab_l }} x {{ slab_w }}</div>
                     </div>
                 </div>
             </div>

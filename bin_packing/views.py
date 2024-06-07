@@ -1,6 +1,7 @@
 import json
+from django.contrib import messages
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from bin_packing.models import Panel
 from bin_packing.utils import custom_data_input, plot_graph
 
@@ -65,7 +66,7 @@ def zip_file_handle(request):
             for slab_data in data['plots']:
                 plot_graph(slab_data, count, algo, heuristic, data['total_bins_used'], csv_file_id, csv_file_path)
                 count += 1
-
-            return HttpResponse('SUCCESS', status=200)
+            # messages.success(request, 'Download Successful')
+            return redirect(request.META.get('HTTP_REFERER', 'fallback_url'))
         return HttpResponse('Error: Requested csv file doesn\'t exists', status=400)
 

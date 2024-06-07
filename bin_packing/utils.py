@@ -48,7 +48,7 @@ def plot_graph(slab_data, num, algo, heuristic, total_bins_used, csv_file_id, cs
 
     # Check if the directory exists, create if not and save the image
     ROOT_DIR = Path(__file__).resolve().parent.parent
-    directory_path = f'{ROOT_DIR}/media/{csv_file_id}/'
+    directory_path = f'{ROOT_DIR}/media/zip_file/{csv_file_id}/'
     if not os.path.exists(directory_path):
         os.makedirs(directory_path)
     image_name = f"image_{num+1}.png"

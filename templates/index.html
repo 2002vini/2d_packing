@@ -69,53 +69,43 @@
 
         <!-- RESULTS DISPLAY SECTION -->
         <div class="col-12 col-sm-6 col-md-3" id="results_section">
-            <h2 class="mmb-4">Results:</h2>
-            <div class="accordion" id="accordionPanelsStayOpenExample">
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="panelsStayOpen-headingOne">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
-                            Global Statistics
-                        </button>
-                    </h2>
-                    <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingOne">
-                        <div class="accordion-body">
-                            <div class="row">
-                                <div class="col">Total Area Occupied</div>
-                                <div class="col text-center">{{ global_area_percentage }}%</div>
-                            </div>
-                            <div class="row">
-                                <div class="col">Total Area Wasted</div>
-                                <div class="col text-center">{{ global_waste_area_percentage }}%</div>
-                            </div>
-                            <div class="row">
-                                <div class="col">Total Bins Used</div>
-                                <div class="col text-center">{{ result.total_bins_used }}</div>
-                            </div>
-                        </div>
+            <h2 class="mb-4">Results:</h2>
+            <div class="card mb-3">
+                <div class="card-header">
+                    Global Statistics
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">Total Area Occupied</div>
+                        <div class="col text-center">{{ global_area_percentage }}%</div>
+                    </div>
+                    <div class="row">
+                        <div class="col">Total Area Wasted</div>
+                        <div class="col text-center">{{ global_waste_area_percentage }}%</div>
+                    </div>
+                    <div class="row">
+                        <div class="col">Total Bins Used</div>
+                        <div class="col text-center">{{ result.total_bins_used }}</div>
                     </div>
                 </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
-                      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
-                          <span class="me-4">Sheet Statistics</span>
-                          <span class="">
-                              <i class="fa-solid fa-less-than me-1"></i>
-                              <span> 1 / {{ result.total_bins_used }} </span>
-                              <i class="fa-solid fa-greater-than ms-1"></i>
-                          </span>
-                      </button>
-                    </h2>
-                    <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingTwo">
-                        <div class="accordion-body">
-                            <div class="row">
-                                <div class="col">Area Occupied</div>
-                                <div class="col text-center">--</div>
-                            </div>
-                            <div class="row">
-                                <div class="col">Area Wasted</div>
-                                <div class="col text-center">--</div>
-                            </div>
-                        </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <span class="me-4">Sheet Statistics</span>
+                    <span class="">
+                        <button class="btn"><i class="fa-solid fa-less-than"></i></button>
+                        <span> 1 / {{ result.total_bins_used }} </span>
+                        <button class="btn"><i class="fa-solid fa-greater-than"></i></button>
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">Area Occupied</div>
+                        <div class="col text-center">--</div>
+                    </div>
+                    <div class="row">
+                        <div class="col">Area Wasted</div>
+                        <div class="col text-center">--</div>
                     </div>
                 </div>
             </div>

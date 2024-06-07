@@ -133,6 +133,10 @@
                             <div class="col">Area wasted (%)</div>
                             <div class="col">{{ data.slab_percentage_wasted }}</div>
                         </div>
+                        <div class="row">
+                            <div class="col">Layout count</div>
+                            <div class="col">{{ data.layout_count }}</div>
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
@@ -201,7 +205,7 @@
     
     <script>
         let currentIndex = 1;
-        let totalSheets = {{ result.total_bins_used }};
+        let totalSheets = {{ unique_layouts_count }};
         document.getElementById('current_layout').innerHTML = currentIndex + ' / ' + totalSheets;
         function sheetStatistics(direction) {
             // Hide current sheet

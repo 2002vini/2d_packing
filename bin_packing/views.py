@@ -34,6 +34,7 @@ def receive_panels(request):
         context['global_area_percentage'] = round(global_total_area_percentage, 2)
         context['global_waste_area_percentage'] = round(global_waste_area_percentage, 2)
         context['global_total_area_wasted'] = round(global_total_area_wasted, 2)
+        context['unique_layouts_count'] = len(result['plots'])
         return render(request, 'index.html', context)
 
     return HttpResponse('Invalid Request', status=400)

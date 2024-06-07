@@ -60,6 +60,7 @@ def custom_data_input(upload_type, algo, heuristic, inventory_data=None, filenam
     M = g.BinManager(SLAB_LENGTH, SLAB_WIDTH, pack_algo=algo, heuristic=heuristic, rotation=True, sorting=True, wastemap=True)
     demoList = []
 
+    # Load data from manual input or CSV file
     if upload_type == 'manual':
         if inventory_data:
             for data in inventory_data:
@@ -80,40 +81,49 @@ def custom_data_input(upload_type, algo, heuristic, inventory_data=None, filenam
                     height = float(item['length'])
                     width = float(item['width'])
                     quantity = int(item['quantity'])
-                    # code = int(item['code'])
-                    # polish_edge_l = int(item['polish_edge_l'])
-                    # polish_edge_w = int(item['polish_edge_w'])
-
                     for _ in range(int(quantity)):
                         demoList.append(g.Item(height, width))
         else:
             raise ValueError("Please provide a valid filename for CSV data.")
+
     M.add_items(*demoList)
     M.execute()
 
-    plots = []
-    total_bins_used = len(M.bins)
-    slab_total_area = SLAB_LENGTH * SLAB_WIDTH
-    global_total_area_used = 0
+    slab_configurations = {}
     for bin in M.bins:
+        rectangles = [(rectangle.width, rectangle.height, rectangle.x, rectangle.y) for rectangle in bin.items]
+        # Sort rectangles by position and size for consistent comparison
+        rectangles.sort()
+        # Convert to a tuple for immutability and use as a dictionary key
+        key = tuple(rectangles)
+        if key in slab_configurations:
+            slab_configurations[key] += 1
+        else:
+            slab_configurations[key] = 1
+
+    # Prepare data to return, incorporating counts of each unique slab configuration
+    plots = []
+    global_total_area_used = 0
+    slab_total_area = SLAB_LENGTH * SLAB_WIDTH
+
+    for config, count in slab_configurations.items():
         slab_details = {}
-        plotList = []
-        area_occupied = 0
-        for rectangle in bin.items:
-            area_occupied += rectangle.area
-            plotList.append({"width": rectangle.width, "height": rectangle.height, "x": rectangle.x, "y": rectangle.y})
-        global_total_area_used += area_occupied
-        percentage_occupied = round((area_occupied / slab_total_area) * 100, 2)
+        plotList = [{'width': rect[0], 'height': rect[1], 'x': rect[2], 'y': rect[3]} for rect in config]
+        area_occupied = sum(rect[0] * rect[1] for rect in config)
+        global_total_area_used += area_occupied * count
+        percentage_occupied = round((area_occupied / slab_total_area) * 100, 3)
+
         slab_details['slab_percentage_occupied'] = percentage_occupied
-        slab_details['slab_percentage_wasted'] = round(100 - percentage_occupied, 2)
+        slab_details['slab_percentage_wasted'] = round(100 - percentage_occupied, 3)
+        slab_details['rectangles'] = plotList
+        slab_details['layout_count'] = count
         slab_details['slab_used_area'] = round(area_occupied, 2)
         slab_details['slab_wasted_area'] = round(slab_total_area - area_occupied, 2)
-        slab_details['rectangles'] = plotList
         plots.append(slab_details)
 
     return {
         'plots': plots,
-        'total_bins_used': total_bins_used,
+        'total_bins_used': len(M.bins),
         'slab_total_area': slab_total_area,
         'global_total_area_used': global_total_area_used
     }

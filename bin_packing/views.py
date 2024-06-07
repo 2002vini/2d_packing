@@ -60,10 +60,10 @@ def zip_file_handle(request):
         if csv_file_obj.exists():
             obj = csv_file_obj[0]
             data = json.loads(obj.json_file)
-            csv_file_path = obj.csv_file.path
+            csv_file_path = obj.csv_file
             count = 0
             for slab_data in data['plots']:
-                plot_graph(slab_data, count, algo, heuristic, data['total_bins_used'], csv_file_path)
+                plot_graph(slab_data, count, algo, heuristic, data['total_bins_used'], csv_file_id, csv_file_path)
                 count += 1
 
             return HttpResponse('SUCCESS', status=200)

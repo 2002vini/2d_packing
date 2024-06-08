@@ -1,9 +1,11 @@
+import csv
 import json
 import os
 import shutil
 import zipfile
+from io import StringIO
 from pathlib import Path
-from django.core.files import File
+from django.core.files.base import ContentFile, File
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
@@ -20,6 +22,7 @@ def index(request):
 
         if slab_length and slab_width:
             result = None
+            panel_obj = None
             if inventory_input_type == 'manual':
                 lengths = request.POST.getlist('length[]')
                 widths = request.POST.getlist('width[]')
@@ -27,18 +30,35 @@ def index(request):
 
                 inventory_data = [{'length': float(length), 'width': float(width), 'quantity': int(quantity)}
                                   for length, width, quantity in zip(lengths, widths, quantities)]
-                result = custom_data_input(inventory_data=inventory_data, upload_type='manual', algo='maximal_rectangle',
-                                           heuristic='best_area', slab_l=float(slab_length), slab_w=float(slab_width))
 
+                # Create CSV file from inventory_data
+                csv_file = StringIO()
+                writer = csv.DictWriter(csv_file, fieldnames=['length', 'width', 'quantity'])
+                writer.writeheader()
+                for data in inventory_data:
+                    writer.writerow(data)
+
+                # Move cursor to beginning of StringIO object to read its content
+                csv_file.seek(0)
+
+                # Save CSV file to Panel model
+                panel_obj = Panel()
+                panel_obj.csv_file.save('inventory_data.csv', ContentFile(csv_file.getvalue(), 'inventory_store_notebook'), save=True)
+                csv_file.close()
+
+                filename = panel_obj.csv_file.name.split('/')[-1]
+                result = custom_data_input(algo='maximal_rectangle', heuristic='best_area', filename=filename,
+                                           slab_l=float(slab_length), slab_w=float(slab_width))
+                panel_obj.json_file = json.dumps(result)
+                panel_obj.save()
 
             elif inventory_input_type == 'csv':
                 csv_file = request.FILES.get('csv_file')
-                result = custom_data_input(upload_type='csv', algo='maximal_rectangle', heuristic='best_area',
-                                           filename=csv_file, slab_l=float(slab_length), slab_w=float(slab_width))
-
-                panel_obj = Panel.objects.create(csv_file=csv_file, json_file=json.dumps(result))
-                context['uploaded_csv_file_id'] = panel_obj.id
-
+                panel_obj = Panel.objects.create(csv_file=csv_file)
+                result = custom_data_input(algo='maximal_rectangle', heuristic='best_area', filename=csv_file,
+                                           slab_l=float(slab_length), slab_w=float(slab_width))
+                panel_obj.json_file = json.dumps(result)
+                panel_obj.save()
             global_total_area_percentage = result['global_total_area_used'] / (result['slab_total_area'] * result['total_bins_used']) * 100
             global_waste_area_percentage = 100 - global_total_area_percentage
             global_total_area_wasted = result['slab_total_area'] * result['total_bins_used'] - result['global_total_area_used']
@@ -51,28 +71,30 @@ def index(request):
             context['slab_l'] = slab_length
             context['slab_w'] = slab_width
             context['show_statistics'] = True
+            context['panel_obj_id'] = panel_obj.id
+
             return render(request, 'index.html', context)
 
         return HttpResponse('Invalid Request, Provide Slab Length and Width', status=400)
-    return render(request,'index.html')
+    return render(request, 'index.html')
 
 
 def zip_file_handle(request):
     if request.method == 'POST':
-        csv_file_id = request.POST.get('uploaded_csv_file_id')
-        csv_file_obj = Panel.objects.filter(id=csv_file_id)
-        if csv_file_obj.exists():
-            csv_obj = csv_file_obj[0]
+        panel_id = request.POST.get('panel_obj_id')
+        panel_obj = Panel.objects.filter(id=panel_id)
+        if panel_obj.exists():
+            csv_obj = panel_obj[0]
             data = json.loads(csv_obj.json_file)
             count = 0
             for slab_data in data['plots']:
-                plot_graph(slab_data, count, data['total_bins_used'], csv_file_id)
+                plot_graph(slab_data, count, data['total_bins_used'], panel_id)
                 count += 1
 
             ROOT_DIR = Path(__file__).resolve().parent.parent
-            zip_filename = f'{csv_file_id}.zip'
-            folder_path = f'{ROOT_DIR}/media/{csv_file_id}'
-            zip_file_path = f'{ROOT_DIR}/media/{csv_file_id}.zip'
+            zip_filename = f'{panel_id}.zip'
+            folder_path = f'{ROOT_DIR}/media/{panel_id}'
+            zip_file_path = f'{ROOT_DIR}/media/{panel_id}.zip'
 
             # Ensure the directory exists
             os.makedirs(folder_path, exist_ok=True)

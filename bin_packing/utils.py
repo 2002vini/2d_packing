@@ -56,37 +56,25 @@ def plot_graph(slab_data, num, total_bins_used, csv_file_id):
     plt.close(fig)
 
 
-def custom_data_input(upload_type, algo, heuristic, inventory_data=None, filename=None, slab_l=138, slab_w=78):
+def custom_data_input(algo, heuristic, filename=None, slab_l=138, slab_w=78):
     SLAB_LENGTH = slab_l
     SLAB_WIDTH = slab_w
     M = g.BinManager(SLAB_LENGTH, SLAB_WIDTH, pack_algo=algo, heuristic=heuristic, rotation=True, sorting=True, wastemap=True)
     demoList = []
 
-    # Load data from manual input or CSV file
-    if upload_type == 'manual':
-        if inventory_data:
-            for data in inventory_data:
-                quantity = data['quantity']
-                length = data['length']
-                width = data['width']
+    if filename:
+        ROOT_DIR = Path(__file__).resolve().parent.parent
+        file_path = f'{ROOT_DIR}/media/csv/{filename}'
+        with open(file_path, mode='r') as file:
+            csv_reader = csv.DictReader(file)
+            for item in csv_reader:
+                height = float(item['length'])
+                width = float(item['width'])
+                quantity = int(item['quantity'])
                 for _ in range(int(quantity)):
-                    demoList.append(g.Item(length, width))
-        else:
-            raise ValueError("Please provide Inventory Data.")
-    elif upload_type == 'csv':
-        if filename:
-            ROOT_DIR = Path(__file__).resolve().parent.parent
-            file_path = f'{ROOT_DIR}/static/csv/{filename}'
-            with open(file_path, mode='r') as file:
-                csv_reader = csv.DictReader(file)
-                for item in csv_reader:
-                    height = float(item['length'])
-                    width = float(item['width'])
-                    quantity = int(item['quantity'])
-                    for _ in range(int(quantity)):
-                        demoList.append(g.Item(height, width))
-        else:
-            raise ValueError("Please provide a valid filename for CSV data.")
+                    demoList.append(g.Item(height, width))
+    else:
+        raise ValueError("Please provide a valid filename for CSV data.")
 
     M.add_items(*demoList)
     M.execute()

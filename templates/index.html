@@ -80,13 +80,13 @@
                     </tbody>
                 </table>
             </div>
-            {% if uploaded_csv_file_id %}
+            {% if panel_obj_id %}
                 <div class="mb-5">
                     <h3>Download Zip File</h3>
                     <form method="post" action="{% url 'bin_packing:zip_file_handle' %}" id="download_csv_form">
                         {% csrf_token %}
-                        <input type="hidden" id="uploaded_csv_file_id" name="uploaded_csv_file_id" value="{{ uploaded_csv_file_id }}">
-                        <button class="btn btn-success" type="button" id="download_csv_button"> Download</button>
+                        <input type="hidden" id="panel_obj_id" name="panel_obj_id" value="{{ panel_obj_id }}">
+                        <button class="btn btn-success" type="button" id="download_button"> Download</button>
                     </form>
                 </div>
             {% endif %}
@@ -257,9 +257,11 @@
     </script>
     
     <script>
-        document.getElementById('download_csv_button').addEventListener('click', function() {
+        let download_button = document.getElementById('download_button')
+        download_button.addEventListener('click', function() {
+            download_button.disabled = true;
             let formData = new FormData(document.getElementById('download_csv_form'));
-            fetch('{% url 'bin_packing:zip_file_handle' %}', {
+            fetch('{% url 'bin_packing:zip_file_handle' %}',{
                 method: 'POST',
                 body: formData,
                 headers: {

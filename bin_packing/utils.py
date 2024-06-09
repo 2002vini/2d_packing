@@ -71,10 +71,14 @@ def custom_data_input(algo, heuristic, filename=None, slab_l=138, slab_w=78):
                 height = float(item['length'])
                 width = float(item['width'])
                 quantity = int(item['quantity'])
+                code = ['code']
+                polish_edge_l = ['polish_edge_l']
+                polish_edge_w = ['polish_edge_w']
+
                 for _ in range(int(quantity)):
                     demoList.append(g.Item(height, width))
     else:
-        raise ValueError("Please provide a valid filename for CSV data.")
+        raise ValueError("Please provide a valid filename.")
 
     M.add_items(*demoList)
     M.execute()

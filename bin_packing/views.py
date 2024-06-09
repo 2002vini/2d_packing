@@ -13,6 +13,15 @@ from bin_packing.models import Panel
 from bin_packing.utils import custom_data_input, plot_graph
 
 
+def create_csv_file(inventory_data):
+    csv_file = StringIO()
+    writer = csv.DictWriter(csv_file, fieldnames=['length', 'width', 'quantity'])
+    writer.writeheader()
+    for data in inventory_data:
+        writer.writerow(data)
+    csv_file.seek(0)                # Move cursor to beginning of StringIO object to read its content
+    return csv_file
+
 def index(request):
     if request.method == 'POST':
         context = {}
@@ -31,15 +40,8 @@ def index(request):
                 inventory_data = [{'length': float(length), 'width': float(width), 'quantity': int(quantity)}
                                   for length, width, quantity in zip(lengths, widths, quantities)]
 
-                # Create CSV file from inventory_data
-                csv_file = StringIO()
-                writer = csv.DictWriter(csv_file, fieldnames=['length', 'width', 'quantity'])
-                writer.writeheader()
-                for data in inventory_data:
-                    writer.writerow(data)
-
-                # Move cursor to beginning of StringIO object to read its content
-                csv_file.seek(0)
+                # Create CSV file of inventory data
+                csv_file = create_csv_file(inventory_data)
 
                 # Save CSV file to Panel model
                 panel_obj = Panel()
@@ -59,6 +61,7 @@ def index(request):
                                            slab_l=float(slab_length), slab_w=float(slab_width))
                 panel_obj.json_file = json.dumps(result)
                 panel_obj.save()
+                
             global_total_area_percentage = result['global_total_area_used'] / (result['slab_total_area'] * result['total_bins_used']) * 100
             global_waste_area_percentage = 100 - global_total_area_percentage
             global_total_area_wasted = result['slab_total_area'] * result['total_bins_used'] - result['global_total_area_used']

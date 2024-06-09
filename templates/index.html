@@ -214,7 +214,7 @@
                     // Tooltip on hover
                     const tooltip = document.createElement("div");
                     rectElem.addEventListener('mouseover', function(event) {
-                        tooltip.innerHTML = `Width: ${rect.width} <br>Height: ${rect.height} <br>Area: ${rect.width * rect.height}`;
+                        tooltip.innerHTML = `Width: ${rect.width} <br>Height: ${rect.height} <br>Area: ${rect.width * rect.height} <br>Product Code: ${rect.code} <br>Polish Length: ${rect.polish_edge_l} <br>Polish Width: ${rect.polish_edge_w} <br>RFT: ${rect.height * rect.polish_edge_l + rect.width * rect.polish_edge_w}`;
                         tooltip.style.position = 'absolute';
                         tooltip.style.left = `${event.pageX + 10}px`;
                         tooltip.style.top = `${event.pageY + 10}px`;

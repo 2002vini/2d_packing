@@ -5,6 +5,8 @@ import csv
 import os
 from pathlib import Path
 
+from greedypacker.item import CustomItem
+
 SLAB_LENGTH = 138
 SLAB_WIDTH = 78
 
@@ -71,12 +73,14 @@ def custom_data_input(algo, heuristic, filename=None, slab_l=138, slab_w=78):
                 height = float(item['length'])
                 width = float(item['width'])
                 quantity = int(item['quantity'])
-                code = ['code']
-                polish_edge_l = ['polish_edge_l']
-                polish_edge_w = ['polish_edge_w']
+                code = item['code']
+                polish_edge_l = item['polish_edge_l']
+                polish_edge_w = item['polish_edge_w']
 
                 for _ in range(int(quantity)):
-                    demoList.append(g.Item(height, width))
+                    # demoList.append(g.Item(height, width))
+                    demoList.append(CustomItem(height, width, code, polish_edge_l, polish_edge_w))
+
     else:
         raise ValueError("Please provide a valid filename.")
 
@@ -85,7 +89,8 @@ def custom_data_input(algo, heuristic, filename=None, slab_l=138, slab_w=78):
 
     slab_configurations = {}
     for bin in M.bins:
-        rectangles = [(rectangle.width, rectangle.height, rectangle.x, rectangle.y) for rectangle in bin.items]
+        rectangles = [(rectangle.width, rectangle.height, rectangle.x, rectangle.y, rectangle.code,
+                       rectangle.polish_edge_l, rectangle.polish_edge_w) for rectangle in bin.items]
         # Sort rectangles by position and size for consistent comparison
         rectangles.sort()
         # Convert to a tuple for immutability and use as a dictionary key
@@ -102,7 +107,7 @@ def custom_data_input(algo, heuristic, filename=None, slab_l=138, slab_w=78):
 
     for config, count in slab_configurations.items():
         slab_details = {}
-        plotList = [{"width": rect[0], "height": rect[1], "x": rect[2], "y": rect[3]} for rect in config]
+        plotList = [{"width": rect[0], "height": rect[1], "x": rect[2], "y": rect[3], "code": rect[4], "polish_edge_l": rect[5], "polish_edge_w": rect[6]} for rect in config]
         area_occupied = sum(rect[0] * rect[1] for rect in config)
         global_total_area_used += area_occupied * count
         percentage_occupied = round((area_occupied / slab_total_area) * 100, 3)

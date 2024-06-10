@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load custom_filters %}
 {% block title %} Inani Marbles {% endblock %}
 {% block stylesheets %}
     <style>
@@ -108,15 +109,19 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col">Total area used</div>
-                        <div class="col">{{ result.global_total_area_used }}</div>
+                        <div class="col">{{ result.global_total_area_used|div:144 }} sq. ft.</div>
+                    </div>
+                    <div class="row">
+                        <div class="col">Total area wasted</div>
+                        <div class="col">{{ global_total_area_wasted|div:144 }} sq. ft.</div>
+                    </div>
+                    <div class="row">
+                        <div class="col">Total area of single slab</div>
+                        <div class="col">{{ result.slab_total_area|div:144 }} sq. ft.</div>
                     </div>
                     <div class="row">
                         <div class="col">Total area used (%)</div>
                         <div class="col">{{ global_area_percentage }}%</div>
-                    </div>
-                    <div class="row">
-                        <div class="col">Total area wasted</div>
-                        <div class="col">{{ global_total_area_wasted }}</div>
                     </div>
                     <div class="row">
                         <div class="col">Total area wasted (%)</div>
@@ -125,10 +130,6 @@
                     <div class="row">
                         <div class="col">Total no of slabs used</div>
                         <div class="col">{{ result.total_bins_used }}</div>
-                    </div>
-                    <div class="row">
-                        <div class="col">Total area of single slab</div>
-                        <div class="col">{{ result.slab_total_area }}</div>
                     </div>
                     <div class="row">
                         <div class="col">Slab Size</div>
@@ -150,15 +151,15 @@
                     <div class="card-body" id="sheet-{{ forloop.counter }}" style="display: {% if forloop.counter == 1 %}block{% else %}none{% endif %};">
                         <div class="row">
                             <div class="col">Area occupied</div>
-                            <div class="col">{{ data.slab_used_area }}</div>
+                            <div class="col">{{ data.slab_used_area|div:144 }} sq. ft.</div>
+                        </div>
+                        <div class="row">
+                            <div class="col">Area wasted</div>
+                            <div class="col">{{ data.slab_wasted_area|div:144 }} sq. ft.</div>
                         </div>
                         <div class="row">
                             <div class="col">Area occupied (%)</div>
                             <div class="col">{{ data.slab_percentage_occupied }}</div>
-                        </div>
-                        <div class="row">
-                            <div class="col">Area wasted</div>
-                            <div class="col">{{ data.slab_wasted_area }}</div>
                         </div>
                         <div class="row">
                             <div class="col">Area wasted (%)</div>

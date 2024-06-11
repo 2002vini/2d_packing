@@ -84,6 +84,12 @@ def create_pdf_file(context):
 
     for idx, plot in enumerate(result['plots']):
         rectangles = plot['rectangles']
+
+        total_rft = 0.0
+        for rect in rectangles:
+            rect_actual_width = rect['width'] - cutting_blade_margin_5mm
+            rect_actual_height = rect['height'] - cutting_blade_margin_5mm
+            total_rft += (rect['polish_edge_l'] * rect_actual_height) + (rect['polish_edge_w'] * rect_actual_width)
         stats_data = {
             'layout_number': idx + 1,
             'unique_layouts_count': context['unique_layouts_count'],
@@ -91,7 +97,8 @@ def create_pdf_file(context):
             'area_wasted': round(plot['slab_wasted_area'] / 144, 2),      # divide by 144 to get area in sq. ft.
             'layout_count': plot['layout_count'],
             'area_occupied_percent': plot['slab_percentage_occupied'],
-            'area_wasted_percent': plot['slab_percentage_wasted']
+            'area_wasted_percent': plot['slab_percentage_wasted'],
+            'total_rft': round(total_rft, 2),
         }
         page_width, page_height = A4
         needed_height = 0.3 * page_height + 0.115 * page_height  # main + stats containers height

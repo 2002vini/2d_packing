@@ -83,7 +83,7 @@ def draw_main_container(c, heading_y, heading_h, rectangles, container_width=138
 
 
 def draw_stats_container(c, main_container_y_position, main_container_height, data):
-    stats_rect_height = 0.115 * page_height
+    stats_rect_height = 0.13 * page_height
     stats_y_position = main_container_y_position + main_container_height
     c.rect(X, stats_y_position, WIDTH, stats_rect_height, stroke=1, fill=0)
 
@@ -96,7 +96,8 @@ def draw_stats_container(c, main_container_y_position, main_container_height, da
         ("Area occupied (%)", f"{data['area_occupied_percent']}%"),
         ("Area wasted", f"{data['area_wasted']} sq. ft."),
         ("Area wasted (%)", f"{data['area_wasted_percent']}%"),
-        ("Layout Count", f"{data['layout_count']}")
+        ("Layout Count", f"{data['layout_count']}"),
+        ("Total RFT", f"{data['total_rft']}"),
     ]
 
     c.setFont("Helvetica", 10)

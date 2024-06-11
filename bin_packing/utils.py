@@ -14,8 +14,6 @@ from django.conf import settings
 SLAB_LENGTH = 138
 SLAB_WIDTH = 78
 cutting_blade_margin_5mm = 5 / 25.4     # considering 1 point == 1 inch
-c = canvas.Canvas(f"/home/vaibhav/test.pdf", pagesize=A4, bottomup=0)
-# c = canvas.Canvas(f"{settings.BASE_DIR}/media/pdf/test.pdf", pagesize=A4, bottomup=0)
 
 
 def plot_graph(slab_data, num, total_bins_used, csv_file_id):
@@ -66,6 +64,8 @@ def plot_graph(slab_data, num, total_bins_used, csv_file_id):
 
 
 def create_pdf_file(context):
+    c = canvas.Canvas(f"/home/vaibhav/test.pdf", pagesize=A4, bottomup=0)
+    # c = canvas.Canvas(f"{settings.BASE_DIR}/media/pdf/test.pdf", pagesize=A4, bottomup=0)
     result = context['result']
     margin = 1 * cm  # Set a margin for aesthetics
     current_y = margin  # Start from the bottom of the page plus a margin

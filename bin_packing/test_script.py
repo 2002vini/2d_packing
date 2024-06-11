@@ -7,7 +7,7 @@ from reportlab.lib import colors
 page_width, page_height = A4
 WIDTH = 0.7 * page_width
 X = (page_width - WIDTH) / 2
-margin_between_container_and_heading = 0.4 * cm
+margin_between_container_and_heading = 1 * cm
 
 
 def draw_heading_container(c, data):
@@ -62,7 +62,7 @@ def draw_stats_container(c, main_container_y_position, main_container_height, da
 
 
 def draw_main_container(c, heading_y, heading_h, rectangles, container_width=138, container_height=78):
-    container_h = 0.4 * page_height
+    container_h = 0.3 * page_height
     container_y = heading_y + heading_h + margin_between_container_and_heading
 
     scale_width = WIDTH / container_width
@@ -81,40 +81,3 @@ def draw_main_container(c, heading_y, heading_h, rectangles, container_width=138
     c.setFillColor(colors.black)
     c.rect(X, container_y, WIDTH, container_h, stroke=1, fill=0)
     return container_y, container_h
-
-
-if __name__ == "__main__":
-    heading_data = {
-        'total_area_used': 3984.09,
-        'total_area_wasted': 664.79,
-        'total_area_of_single_slab': 4648.88,
-        'total_area_used_percent': 85.70,
-        'total_area_wasted_percent': 14.30,
-        'total_no_of_slabs_used': 4,
-        'slab_width': 138,
-        'slab_height': 78
-    }
-    stats_data = {
-        'layout_number': 1,
-        'area_occupied': 3984.09,
-        'area_wasted': 664.79,
-        'layout_count': 4,
-        'area_occupied_percent': 85.70,
-        'area_wasted_percent': 14.30
-    }
-    rectangles = [
-        {'width': 4.0, 'height': 36.625, 'x': 124.75, 'y': 0},
-        {'width': 4.0, 'height': 36.625, 'x': 128.75, 'y': 0},
-        {'width': 4.0, 'height': 36.625, 'x': 132.75, 'y': 0},
-        {'width': 36.0, 'height': 25.0, 'x': 102.0, 'y': 42.0},
-        {'width': 102.0, 'height': 25.0, 'x': 0, 'y': 42.0},
-        {'width': 124.75, 'height': 42.0, 'x': 0, 'y': 0},
-    ]
-    c = canvas.Canvas("/home/vaibhav/test.pdf", pagesize=A4, bottomup=0)
-    heading_h, heading_y = draw_heading_container(c, heading_data)
-    container_y, container_h = draw_main_container(c, heading_y, heading_h, rectangles)
-    draw_stats_container(c, container_y, container_h, stats_data)
-    c.save()
-
-
-

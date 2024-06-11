@@ -7,6 +7,7 @@ page_width, page_height = A4
 WIDTH = 0.7 * page_width
 X = (page_width - WIDTH) / 2
 margin_between_container_and_heading = 1 * cm
+cutting_blade_margin_5mm = 5 / 25.4     # considering 1 point == 1 inch
 
 
 def draw_heading_container(c, data):
@@ -43,13 +44,38 @@ def draw_main_container(c, heading_y, heading_h, rectangles, container_width=138
     scale_width = WIDTH / container_width
     scale_height = container_h / container_height
 
-    c.setFillColor(colors.lightblue)
     for rect in rectangles:
         scaled_width = rect['width'] * scale_width
         scaled_height = rect['height'] * scale_height
         scaled_x = X + rect['x'] * scale_width
         scaled_y = container_y + container_h - (rect['y'] * scale_height + scaled_height)
+
+        # Set fill color for rectangle
+        c.setFillColor(colors.lightblue)
         c.rect(scaled_x, scaled_y, scaled_width, scaled_height, stroke=1, fill=1)
+
+        # Determine text orientation based on rectangle dimensions
+        c.setFillColor(colors.black)
+        c.setFont("Helvetica", 5)
+        rect_actual_width = rect['width'] - cutting_blade_margin_5mm
+        rect_actual_height = rect['height'] - cutting_blade_margin_5mm
+        code_text = f"Code: {rect['code']}"
+        size_text = f"Size: {rect_actual_width} x {rect_actual_height}"
+        # Calculate center positions
+        center_x = scaled_x + scaled_width / 2
+        center_y = scaled_y + scaled_height / 2
+
+        if rect['width'] < rect['height']:
+            # Rotate text for vertical rectangles
+            c.saveState()
+            c.translate(scaled_x + scaled_width / 2, scaled_y + scaled_height / 2)
+            c.rotate(90)
+            c.drawCentredString(0, -2, code_text)  # Shift text slightly
+            c.drawCentredString(0, 7, size_text)
+            c.restoreState()
+        else:
+            c.drawCentredString(center_x, center_y - 5, code_text)
+            c.drawCentredString(center_x, center_y + 5, size_text)
 
     c.setFillColor(colors.black)
     c.rect(X, container_y, WIDTH, container_h, stroke=1, fill=0)

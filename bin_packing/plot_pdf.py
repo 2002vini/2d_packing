@@ -65,7 +65,7 @@ def draw_stats_container(c, main_container_y_position, main_container_height, da
     stat_text_y = stats_y_position + 0.6 * cm
 
     stats_data = [
-        ("Layout Number", f"{data['layout_number']} of 12"),
+        ("Layout Number", f"{data['layout_number']} of {data['unique_layouts_count']}"),
         ("Area occupied", f"{data['area_occupied']} sq. ft."),
         ("Area occupied (%)", f"{data['area_occupied_percent']}%"),
         ("Area wasted", f"{data['area_wasted']} sq. ft."),

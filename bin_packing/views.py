@@ -22,6 +22,7 @@ def create_csv_file(inventory_data):
     csv_file.seek(0)                # Move cursor to beginning of StringIO object to read its content
     return csv_file
 
+
 def index(request):
     if request.method == 'POST':
         context = {}

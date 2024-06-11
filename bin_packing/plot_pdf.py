@@ -70,12 +70,12 @@ def draw_main_container(c, heading_y, heading_h, rectangles, container_width=138
             c.saveState()
             c.translate(scaled_x + scaled_width / 2, scaled_y + scaled_height / 2)
             c.rotate(90)
-            c.drawCentredString(0, -2, code_text)  # Shift text slightly
-            c.drawCentredString(0, 7, size_text)
+            c.drawCentredString(0, -1, code_text)  # Shift text slightly
+            c.drawCentredString(0, 5, size_text)
             c.restoreState()
         else:
-            c.drawCentredString(center_x, center_y - 5, code_text)
-            c.drawCentredString(center_x, center_y + 5, size_text)
+            c.drawCentredString(center_x, center_y - 3, code_text)
+            c.drawCentredString(center_x, center_y + 3, size_text)
 
     c.setFillColor(colors.black)
     c.rect(X, container_y, WIDTH, container_h, stroke=1, fill=0)

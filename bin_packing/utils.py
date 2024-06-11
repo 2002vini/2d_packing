@@ -86,6 +86,7 @@ def create_pdf_file(context):
         rectangles = plot['rectangles']
         stats_data = {
             'layout_number': idx + 1,
+            'unique_layouts_count': context['unique_layouts_count'],
             'area_occupied': round(plot['slab_used_area'] / 144, 2),      # divide by 144 to get area in sq. ft.
             'area_wasted': round(plot['slab_wasted_area'] / 144, 2),      # divide by 144 to get area in sq. ft.
             'layout_count': plot['layout_count'],

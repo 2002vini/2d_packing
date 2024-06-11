@@ -1,4 +1,3 @@
-from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
 from reportlab.lib import colors
@@ -37,6 +36,26 @@ def draw_heading_container(c, data):
     return heading_height, heading_y_position
 
 
+def draw_main_container(c, heading_y, heading_h, rectangles, container_width=138, container_height=78):
+    container_h = 0.3 * page_height
+    container_y = heading_y + heading_h + margin_between_container_and_heading
+
+    scale_width = WIDTH / container_width
+    scale_height = container_h / container_height
+
+    c.setFillColor(colors.lightblue)
+    for rect in rectangles:
+        scaled_width = rect['width'] * scale_width
+        scaled_height = rect['height'] * scale_height
+        scaled_x = X + rect['x'] * scale_width
+        scaled_y = container_y + container_h - (rect['y'] * scale_height + scaled_height)
+        c.rect(scaled_x, scaled_y, scaled_width, scaled_height, stroke=1, fill=1)
+
+    c.setFillColor(colors.black)
+    c.rect(X, container_y, WIDTH, container_h, stroke=1, fill=0)
+    return container_y, container_h
+
+
 def draw_stats_container(c, main_container_y_position, main_container_height, data):
     stats_rect_height = 0.115 * page_height
     stats_y_position = main_container_y_position + main_container_height
@@ -60,24 +79,3 @@ def draw_stats_container(c, main_container_y_position, main_container_height, da
         c.drawString(stat_text_x, stat_text_y + 14*i, label)
         c.drawString(stat_text_x + column_gap, stat_text_y + 14*i, value)
 
-
-def draw_main_container(c, heading_y, heading_h, rectangles, container_width=138, container_height=78):
-    container_h = 0.3 * page_height
-    container_y = heading_y + heading_h + margin_between_container_and_heading
-
-    scale_width = WIDTH / container_width
-    scale_height = container_h / container_height
-
-    c.setFillColor(colors.lightblue)
-    # Draw scaled rectangles inside the main container
-    for rect in rectangles:
-        scaled_width = rect['width'] * scale_width
-        scaled_height = rect['height'] * scale_height
-        scaled_x = X + rect['x'] * scale_width
-        # scaled_y = container_y + rect['y'] * scale_height
-        scaled_y = container_y + container_h - (rect['y'] * scale_height + scaled_height)
-        c.rect(scaled_x, scaled_y, scaled_width, scaled_height, stroke=1, fill=1)
-
-    c.setFillColor(colors.black)
-    c.rect(X, container_y, WIDTH, container_h, stroke=1, fill=0)
-    return container_y, container_h

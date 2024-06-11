@@ -5,8 +5,9 @@ import csv
 import os
 from pathlib import Path
 from greedypacker.item import CustomItem
-from bin_packing.test_script import draw_heading_container, draw_stats_container, draw_main_container
+from bin_packing.plot_pdf import draw_heading_container, draw_stats_container, draw_main_container
 from reportlab.pdfgen import canvas
+from reportlab.lib.units import cm
 from reportlab.lib.pagesizes import A4
 from django.conf import settings
 
@@ -66,6 +67,10 @@ def plot_graph(slab_data, num, total_bins_used, csv_file_id):
 
 def create_pdf_file(context):
     result = context['result']
+    margin = 1 * cm  # Set a margin for aesthetics
+    current_y = margin  # Start from the bottom of the page plus a margin
+    plots_per_page = 0
+
     heading_data = {
         'total_area_used': round(result['global_total_area_used'] / 144, 2),      # divide by 144 to get area in sq. ft.
         'total_area_wasted': round(context['global_total_area_wasted'] / 144, 2), # divide by 144 to get area in sq. ft.
@@ -87,14 +92,24 @@ def create_pdf_file(context):
             'area_occupied_percent': plot['slab_percentage_occupied'],
             'area_wasted_percent': plot['slab_percentage_wasted']
         }
+        page_width, page_height = A4
+        needed_height = 0.3 * page_height + 0.115 * page_height  # main + stats containers height
+        if current_y + needed_height > page_height - margin or plots_per_page == 2:
+            c.showPage()
+            current_y = margin
+            plots_per_page = 0
 
         if idx == 0:
             heading_h, heading_y = draw_heading_container(c, heading_data)
-            container_y, container_h = draw_main_container(c, heading_y, heading_h, rectangles)
-        else:
-            container_y, container_h = draw_main_container(c, 20, 0, rectangles)
+            current_y += heading_h  # Adjust current_y to account for the height of the heading
+
+        container_y, container_h = draw_main_container(c, current_y, 0, rectangles)  # heading_h is 0 for subsequent pages
         draw_stats_container(c, container_y, container_h, stats_data)
-        c.showPage()
+
+        # Update the current_y position and plots count
+        current_y += container_h + 0.115 * page_height + margin
+        plots_per_page += 1
+
     c.save()
 
 

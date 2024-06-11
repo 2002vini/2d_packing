@@ -9,7 +9,6 @@ WIDTH = 0.7 * page_width
 X = (page_width - WIDTH) / 2
 c = canvas.Canvas("/home/vaibhav/test.pdf", pagesize=A4, bottomup=0)
 margin_between_container_and_heading = 0.4 * cm
-cutting_blade_margin_5mm = 5 / 25.4     # considering 1 point == 1
 
 
 def draw_heading_container(data):

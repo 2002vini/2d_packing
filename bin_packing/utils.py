@@ -4,11 +4,11 @@ import greedypacker as g
 import csv
 import os
 from pathlib import Path
-
 from greedypacker.item import CustomItem
 
 SLAB_LENGTH = 138
 SLAB_WIDTH = 78
+cutting_blade_margin_5mm = 5 / 25.4     # considering 1 point == 1 inch
 
 
 def plot_graph(slab_data, num, total_bins_used, csv_file_id):
@@ -70,8 +70,8 @@ def custom_data_input(algo, heuristic, filename=None, slab_l=138, slab_w=78):
         with open(file_path, mode='r') as file:
             csv_reader = csv.DictReader(file)
             for item in csv_reader:
-                height = float(item['length'])
-                width = float(item['width'])
+                height = float(item['length']) + cutting_blade_margin_5mm
+                width = float(item['width']) + cutting_blade_margin_5mm
                 quantity = int(item['quantity'])
                 code = item['code']
                 polish_edge_l = item['polish_edge_l']

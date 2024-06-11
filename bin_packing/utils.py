@@ -8,12 +8,13 @@ from greedypacker.item import CustomItem
 from bin_packing.test_script import draw_heading_container, draw_stats_container, draw_main_container
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
-
+from django.conf import settings
 
 SLAB_LENGTH = 138
 SLAB_WIDTH = 78
 cutting_blade_margin_5mm = 5 / 25.4     # considering 1 point == 1 inch
-c = canvas.Canvas("/home/vaibhav/test.pdf", pagesize=A4, bottomup=0)
+c = canvas.Canvas(f"/home/vaibhav/test.pdf", pagesize=A4, bottomup=0)
+# c = canvas.Canvas(f"{settings.BASE_DIR}/media/pdf/test.pdf", pagesize=A4, bottomup=0)
 
 
 def plot_graph(slab_data, num, total_bins_used, csv_file_id):
@@ -67,11 +68,11 @@ def create_pdf_file(context):
     result = context['result']
     heading_data = {
         'total_area_used': round(result['global_total_area_used'] / 144, 2),      # divide by 144 to get area in sq. ft.
-        'total_area_wasted': round(context['global_total_area_wasted'] / 144, 2),      # divide by 144 to get area in sq. ft.
+        'total_area_wasted': round(context['global_total_area_wasted'] / 144, 2), # divide by 144 to get area in sq. ft.
         'total_area_used_percent': context['global_area_percentage'],
         'total_area_wasted_percent': context['global_waste_area_percentage'],
         'total_no_of_slabs_used': result['total_bins_used'],
-        'total_area_of_single_slab': round(result['slab_total_area'] / 144, 2),      # divide by 144 to get area in sq. ft.
+        'total_area_of_single_slab': round(result['slab_total_area'] / 144, 2),   # divide by 144 to get area in sq. ft.
         'slab_width': context['slab_l'],
         'slab_height': context['slab_w']
     }
@@ -87,11 +88,14 @@ def create_pdf_file(context):
             'area_wasted_percent': plot['slab_percentage_wasted']
         }
 
-        heading_h, heading_y = draw_heading_container(c, heading_data)
-        container_y, container_h = draw_main_container(c, heading_y, heading_h, rectangles)
+        if idx == 0:
+            heading_h, heading_y = draw_heading_container(c, heading_data)
+            container_y, container_h = draw_main_container(c, heading_y, heading_h, rectangles)
+        else:
+            container_y, container_h = draw_main_container(c, 20, 0, rectangles)
         draw_stats_container(c, container_y, container_h, stats_data)
-        c.save()
-        break
+        c.showPage()
+    c.save()
 
 
 def custom_data_input(algo, heuristic, filename=None, slab_l=138, slab_w=78):
@@ -110,8 +114,8 @@ def custom_data_input(algo, heuristic, filename=None, slab_l=138, slab_w=78):
                 width = float(item['width']) + cutting_blade_margin_5mm
                 quantity = int(item['quantity'])
                 code = item['code']
-                polish_edge_l = item['polish_edge_l']
-                polish_edge_w = item['polish_edge_w']
+                polish_edge_l = int(item['polish_edge_l'])
+                polish_edge_w = int(item['polish_edge_w'])
 
                 for _ in range(int(quantity)):
                     # demoList.append(g.Item(height, width))
@@ -163,31 +167,3 @@ def custom_data_input(algo, heuristic, filename=None, slab_l=138, slab_w=78):
         "global_total_area_used": global_total_area_used
     }
 
-
-# if __name__ == '__main__':
-#     algorithms = {
-#         'maximal_rectangle': ['best_area'],
-#         # 'maximal_rectangle': ['best_area', 'best_shortside', 'best_longside', 'worst_area', 'worst_shortside', 'worst_longside', 'bottom_left', 'contact_point'],
-#         # 'guillotine': ['best_area', 'best_shortside', 'best_longside', 'worst_area', 'worst_shortside', 'worst_longside'],
-#         # 'skyline': ['bottom_left', 'best_fit']
-#     }
-#
-#     for algo in algorithms:
-#         for heuristic in algorithms[algo]:
-#             result = custom_data_input('csv', algo, heuristic, [], 'tiles_data_4.csv')
-#
-#             count = 0
-#             for slab_data in result['plots']:
-#                 plot_graph(slab_data, count, algo, heuristic, result['total_bins_used'])
-#                 count += 1
-
-
-# *** ACTUAL ANSWERS ***
-# Tile Data 1: 131
-# Tile Data 2: 63
-# Tile Data 3: 42
-# Tile Data 4: 10
-# Tile Data 5: 54
-# Tile Data 6: 72
-# Tile Data 7: 14
-# Tile Data 8: 98

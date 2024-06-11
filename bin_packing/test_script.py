@@ -7,11 +7,10 @@ from reportlab.lib import colors
 page_width, page_height = A4
 WIDTH = 0.7 * page_width
 X = (page_width - WIDTH) / 2
-c = canvas.Canvas("/home/vaibhav/test.pdf", pagesize=A4, bottomup=0)
 margin_between_container_and_heading = 0.4 * cm
 
 
-def draw_heading_container(data):
+def draw_heading_container(c, data):
     heading_height = 0.155 * page_height
     heading_y_position = 30
     c.rect(X, heading_y_position, WIDTH, heading_height, stroke=1, fill=0)
@@ -38,7 +37,7 @@ def draw_heading_container(data):
     return heading_height, heading_y_position
 
 
-def draw_stats_container(main_container_y_position, main_container_height, data):
+def draw_stats_container(c, main_container_y_position, main_container_height, data):
     stats_rect_height = 0.115 * page_height
     stats_y_position = main_container_y_position + main_container_height
     c.rect(X, stats_y_position, WIDTH, stats_rect_height, stroke=1, fill=0)
@@ -62,7 +61,7 @@ def draw_stats_container(main_container_y_position, main_container_height, data)
         c.drawString(stat_text_x + column_gap, stat_text_y + 14*i, value)
 
 
-def draw_main_container(heading_y, heading_h, rectangles, container_width=138, container_height=78):
+def draw_main_container(c, heading_y, heading_h, rectangles, container_width=138, container_height=78):
     container_h = 0.4 * page_height
     container_y = heading_y + heading_h + margin_between_container_and_heading
 
@@ -111,11 +110,11 @@ if __name__ == "__main__":
         {'width': 102.0, 'height': 25.0, 'x': 0, 'y': 42.0},
         {'width': 124.75, 'height': 42.0, 'x': 0, 'y': 0},
     ]
+    c = canvas.Canvas("/home/vaibhav/test.pdf", pagesize=A4, bottomup=0)
+    heading_h, heading_y = draw_heading_container(c, heading_data)
+    container_y, container_h = draw_main_container(c, heading_y, heading_h, rectangles)
+    draw_stats_container(c, container_y, container_h, stats_data)
+    c.save()
 
-    heading_h, heading_y = draw_heading_container(heading_data)
-    container_y, container_h = draw_main_container(heading_y, heading_h, rectangles)
-    draw_stats_container(container_y, container_h, stats_data)
-
-c.save()
 
 

@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from bin_packing.models import Panel
-from bin_packing.utils import custom_data_input, plot_graph
+from bin_packing.utils import custom_data_input, plot_graph, create_pdf_file
 
 
 def create_csv_file(inventory_data):
@@ -75,6 +75,8 @@ def index(request):
             context['slab_w'] = slab_width
             context['show_statistics'] = True
             context['panel_obj_id'] = panel_obj.id
+
+            create_pdf_file(context)
 
             return render(request, 'index.html', context)
 

@@ -5,10 +5,15 @@ import csv
 import os
 from pathlib import Path
 from greedypacker.item import CustomItem
+from bin_packing.test_script import draw_heading_container, draw_stats_container, draw_main_container
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+
 
 SLAB_LENGTH = 138
 SLAB_WIDTH = 78
 cutting_blade_margin_5mm = 5 / 25.4     # considering 1 point == 1 inch
+c = canvas.Canvas("/home/vaibhav/test.pdf", pagesize=A4, bottomup=0)
 
 
 def plot_graph(slab_data, num, total_bins_used, csv_file_id):
@@ -56,6 +61,37 @@ def plot_graph(slab_data, num, total_bins_used, csv_file_id):
     image_name = f"image_{num+1}.png"
     plt.savefig(directory_path + image_name)
     plt.close(fig)
+
+
+def create_pdf_file(context):
+    result = context['result']
+    heading_data = {
+        'total_area_used': round(result['global_total_area_used'] / 144, 2),      # divide by 144 to get area in sq. ft.
+        'total_area_wasted': round(context['global_total_area_wasted'] / 144, 2),      # divide by 144 to get area in sq. ft.
+        'total_area_used_percent': context['global_area_percentage'],
+        'total_area_wasted_percent': context['global_waste_area_percentage'],
+        'total_no_of_slabs_used': result['total_bins_used'],
+        'total_area_of_single_slab': round(result['slab_total_area'] / 144, 2),      # divide by 144 to get area in sq. ft.
+        'slab_width': context['slab_l'],
+        'slab_height': context['slab_w']
+    }
+
+    for idx, plot in enumerate(result['plots']):
+        rectangles = plot['rectangles']
+        stats_data = {
+            'layout_number': idx + 1,
+            'area_occupied': round(plot['slab_used_area'] / 144, 2),      # divide by 144 to get area in sq. ft.
+            'area_wasted': round(plot['slab_wasted_area'] / 144, 2),      # divide by 144 to get area in sq. ft.
+            'layout_count': plot['layout_count'],
+            'area_occupied_percent': plot['slab_percentage_occupied'],
+            'area_wasted_percent': plot['slab_percentage_wasted']
+        }
+
+        heading_h, heading_y = draw_heading_container(c, heading_data)
+        container_y, container_h = draw_main_container(c, heading_y, heading_h, rectangles)
+        draw_stats_container(c, container_y, container_h, stats_data)
+        c.save()
+        break
 
 
 def custom_data_input(algo, heuristic, filename=None, slab_l=138, slab_w=78):

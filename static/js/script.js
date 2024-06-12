@@ -8,6 +8,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td><input type="number" name="length[]" class="form-control" min="0" step="any" required></td>
                 <td><input type="number" name="width[]" class="form-control" min="0" step="any" required></td>
                 <td><input type="number" name="quantity[]" class="form-control" min="0" step="any" required></td>
+                <td><input type="text" name="code[]" class="form-control" required></td>
+                <td><input type="number" name="polish_edge_l[]" class="form-control" min="0" max="2" step="any" required></td>
+                <td><input type="number" name="polish_edge_w[]" class="form-control" min="0" max="2" step="any" required></td>
                 <td><button type="button" class="btn btn-danger removeRow">-</button></td>
             `;
             tableBody.appendChild(newRow);

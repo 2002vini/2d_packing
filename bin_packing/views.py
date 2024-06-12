@@ -15,7 +15,7 @@ from bin_packing.utils import custom_data_input, plot_graph, create_pdf_file
 
 def create_csv_file(inventory_data):
     csv_file = StringIO()
-    writer = csv.DictWriter(csv_file, fieldnames=['length', 'width', 'quantity'])
+    writer = csv.DictWriter(csv_file, fieldnames=['length', 'width', 'quantity', 'code', 'polish_edge_l', 'polish_edge_w'])
     writer.writeheader()
     for data in inventory_data:
         writer.writerow(data)
@@ -37,9 +37,13 @@ def index(request):
                 lengths = request.POST.getlist('length[]')
                 widths = request.POST.getlist('width[]')
                 quantities = request.POST.getlist('quantity[]')
+                codes = request.POST.getlist('code[]')
+                polish_edge_l = request.POST.getlist('polish_edge_l[]')
+                polish_edge_w = request.POST.getlist('polish_edge_w[]')
 
-                inventory_data = [{'length': float(length), 'width': float(width), 'quantity': int(quantity)}
-                                  for length, width, quantity in zip(lengths, widths, quantities)]
+                inventory_data = [{'length': float(length), 'width': float(width), 'quantity': int(quantity), 'code': code, 'polish_edge_l': int(polish_l), 'polish_edge_w': int(polish_w)}
+                                  for length, width, quantity, code, polish_l, polish_w
+                                  in zip(lengths, widths, quantities, codes, polish_edge_l, polish_edge_w)]
 
                 # Create CSV file of inventory data
                 csv_file = create_csv_file(inventory_data)

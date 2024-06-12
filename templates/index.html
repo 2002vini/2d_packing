@@ -25,7 +25,90 @@
     {% include 'includes/navbar.html' %}
     <div class="row mt-3" style="width: 95%; margin: auto;">
         <!-- INVENTORY INPUT SECTION -->
-        <div class="col-12 col-sm-6 col-md-3" id="input_section">
+        <div class="col-12 col-sm-6 col-md-5" id="input_section">
+            <!-- RESULTS DISPLAY SECTION -->
+            {% if show_statistics %}
+            <div class="mb-5" id="results_section">
+                <h2 class="mb-4">Statistics</h2>
+                <div class="card mb-3">
+                    <div class="card-header">
+                        Global Statistics
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">Total area used</div>
+                            <div class="col">{{ result.global_total_area_used|div:144 }} sq. ft.</div>
+                        </div>
+                        <div class="row">
+                            <div class="col">Total area wasted</div>
+                            <div class="col">{{ global_total_area_wasted|div:144 }} sq. ft.</div>
+                        </div>
+                        <div class="row">
+                            <div class="col">Total area of single slab</div>
+                            <div class="col">{{ result.slab_total_area|div:144 }} sq. ft.</div>
+                        </div>
+                        <div class="row">
+                            <div class="col">Total area used (%)</div>
+                            <div class="col">{{ global_area_percentage }}%</div>
+                        </div>
+                        <div class="row">
+                            <div class="col">Total area wasted (%)</div>
+                            <div class="col">{{ global_waste_area_percentage }}%</div>
+                        </div>
+                        <div class="row">
+                            <div class="col">Total no of slabs used</div>
+                            <div class="col">{{ result.total_bins_used }}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col">Slab Size</div>
+                            <div class="col">{{ slab_l }} x {{ slab_w }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <span class="me-4">Sheet Statistics</span>
+                        <span class="">
+                            <button class="btn" onclick="sheetStatistics(-1)"><i class="fa-solid fa-less-than"></i></button>
+                            <span id="current_layout"></span>
+                            <button class="btn" onclick="sheetStatistics(1)"><i class="fa-solid fa-greater-than"></i></button>
+                        </span>
+                    </div>
+                    <div id="statisticsContent">
+                        {% for data in result.plots %}
+                        <div class="card-body" id="sheet-{{ forloop.counter }}" style="display: {% if forloop.counter == 1 %}block{% else %}none{% endif %};">
+                            <div class="row">
+                                <div class="col">Area occupied</div>
+                                <div class="col">{{ data.slab_used_area|div:144 }} sq. ft.</div>
+                            </div>
+                            <div class="row">
+                                <div class="col">Area wasted</div>
+                                <div class="col">{{ data.slab_wasted_area|div:144 }} sq. ft.</div>
+                            </div>
+                            <div class="row">
+                                <div class="col">Area occupied (%)</div>
+                                <div class="col">{{ data.slab_percentage_occupied }}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col">Area wasted (%)</div>
+                                <div class="col">{{ data.slab_percentage_wasted }}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col">Layout count</div>
+                                <div class="col">{{ data.layout_count }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="p-3 mt-3 border shadow-sm">
+                    NOTE: These calculations are done by adding some cutting blade margin of 5mm to each rectangle.
+                    <br>5mm in width
+                    <br>5mm in height
+                </div>
+            </div>
+            {% endif %}
+
             <div class="mb-5">
                 <h3 class="mb-3">Input Tiles Dimensions</h3>
                 <form action="{% url 'bin_packing:index' %}" id="panelForm" method="post">
@@ -39,6 +122,9 @@
                                 <th>Length</th>
                                 <th>Width</th>
                                 <th>Qty</th>
+                                <th>Code</th>
+                                <th>Polish Edge (L)</th>
+                                <th>Polish Edge (W)</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -47,6 +133,9 @@
                                 <td><input type="number" name="length[]" class="form-control" min="0" step="any" required></td>
                                 <td><input type="number" name="width[]" class="form-control" min="0" step="any" required></td>
                                 <td><input type="number" name="quantity[]" class="form-control" min="0" step="any" required></td>
+                                <td><input type="text" name="code[]" class="form-control" required></td>
+                                <td><input type="number" name="polish_edge_l[]" class="form-control" min="0" max="2" step="any" required></td>
+                                <td><input type="number" name="polish_edge_w[]" class="form-control" min="0" max="2" step="any" required></td>
                                 <td><button type="button" class="btn btn-primary addRow">+</button></td>
                             </tr>
                         </tbody>
@@ -96,96 +185,12 @@
                     </div>
                 </div>
             {% endif %}
-
         </div>
 
         <!-- GRAPH PLOT SECTION -->
-        <div class="col-12 col-sm-6 text-center" id="graph_section">
+        <div class="col-12 col-sm-6 col-md-7 text-center" id="graph_section">
             <!-- Dynamic SVGs will be appended here -->
         </div>
-
-        <!-- RESULTS DISPLAY SECTION -->
-        {% if show_statistics %}
-        <div class="col-12 col-sm-6 col-md-3" id="results_section">
-            <h2 class="mb-4">Statistics</h2>
-            <div class="card mb-3">
-                <div class="card-header">
-                    Global Statistics
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col">Total area used</div>
-                        <div class="col">{{ result.global_total_area_used|div:144 }} sq. ft.</div>
-                    </div>
-                    <div class="row">
-                        <div class="col">Total area wasted</div>
-                        <div class="col">{{ global_total_area_wasted|div:144 }} sq. ft.</div>
-                    </div>
-                    <div class="row">
-                        <div class="col">Total area of single slab</div>
-                        <div class="col">{{ result.slab_total_area|div:144 }} sq. ft.</div>
-                    </div>
-                    <div class="row">
-                        <div class="col">Total area used (%)</div>
-                        <div class="col">{{ global_area_percentage }}%</div>
-                    </div>
-                    <div class="row">
-                        <div class="col">Total area wasted (%)</div>
-                        <div class="col">{{ global_waste_area_percentage }}%</div>
-                    </div>
-                    <div class="row">
-                        <div class="col">Total no of slabs used</div>
-                        <div class="col">{{ result.total_bins_used }}</div>
-                    </div>
-                    <div class="row">
-                        <div class="col">Slab Size</div>
-                        <div class="col">{{ slab_l }} x {{ slab_w }}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-header">
-                    <span class="me-4">Sheet Statistics</span>
-                    <span class="">
-                        <button class="btn" onclick="sheetStatistics(-1)"><i class="fa-solid fa-less-than"></i></button>
-                        <span id="current_layout"></span>
-                        <button class="btn" onclick="sheetStatistics(1)"><i class="fa-solid fa-greater-than"></i></button>
-                    </span>
-                </div>
-                <div id="statisticsContent">
-                    {% for data in result.plots %}
-                    <div class="card-body" id="sheet-{{ forloop.counter }}" style="display: {% if forloop.counter == 1 %}block{% else %}none{% endif %};">
-                        <div class="row">
-                            <div class="col">Area occupied</div>
-                            <div class="col">{{ data.slab_used_area|div:144 }} sq. ft.</div>
-                        </div>
-                        <div class="row">
-                            <div class="col">Area wasted</div>
-                            <div class="col">{{ data.slab_wasted_area|div:144 }} sq. ft.</div>
-                        </div>
-                        <div class="row">
-                            <div class="col">Area occupied (%)</div>
-                            <div class="col">{{ data.slab_percentage_occupied }}</div>
-                        </div>
-                        <div class="row">
-                            <div class="col">Area wasted (%)</div>
-                            <div class="col">{{ data.slab_percentage_wasted }}</div>
-                        </div>
-                        <div class="row">
-                            <div class="col">Layout count</div>
-                            <div class="col">{{ data.layout_count }}</div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="p-3 mt-3 border shadow-sm">
-                NOTE: These calculations are done by adding some cutting blade margin of 5mm to each rectangle.
-                <br>5mm in width
-                <br>5mm in height
-            </div>
-        </div>
-        {% endif %}
     </div>
 {% endblock %}
 

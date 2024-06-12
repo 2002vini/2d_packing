@@ -34,12 +34,12 @@ def draw_heading_container(c, data):
         c.drawString(text_x, text_y + 14 * (i + 1), label)
         c.drawString(text_x + column_gap, text_y + 14 * (i + 1), value)
 
-    return heading_height, heading_y_position
+    return heading_y_position + heading_height
 
 
-def draw_main_container(c, heading_y, heading_h, rectangles, slab_width=138, slab_height=78):
+def draw_main_container(c, heading_y_end, rectangles, slab_width=138, slab_height=78):
     container_h = 0.3 * page_height
-    container_y = heading_y + heading_h + margin_between_container_and_heading
+    container_y = heading_y_end + margin_between_container_and_heading
 
     scale_width = WIDTH / slab_width
     scale_height = container_h / slab_height
@@ -57,8 +57,8 @@ def draw_main_container(c, heading_y, heading_h, rectangles, slab_width=138, sla
         # Determine text orientation based on rectangle dimensions
         c.setFillColor(colors.black)
         c.setFont("Helvetica", 5)
-        rect_actual_width = rect['width'] - cutting_blade_margin_5mm
-        rect_actual_height = rect['height'] - cutting_blade_margin_5mm
+        rect_actual_width = round(rect['width'] - cutting_blade_margin_5mm, 2)
+        rect_actual_height = round(rect['height'] - cutting_blade_margin_5mm, 2)
         code_text = f"Code: {rect['code']}"
         size_text = f"Size: {rect_actual_width} x {rect_actual_height}"
         # Calculate center positions

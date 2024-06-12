@@ -64,33 +64,39 @@
                     <input class="form-control mb-3" name="csv_file" id="csv_file_input" type="file">
                 </form>
             </div>
-            <div class="mb-5">
-                <h3>Input Slab Dimensions</h3>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Length</th>
-                            <th>Width</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><input class="form-control" name="slab_length" id="slab_length" type="number" value="{% if slab_l %}{{ slab_l }}{% else %}138{% endif %}" min="0"></td>
-                            <td><input class="form-control" name="slab_width" id="slab_width" type="number" value="{% if slab_w %}{{ slab_w }}{% else %}78{% endif %}" min="0"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            {% if panel_obj_id %}
+{#            <div class="mb-5">#}
+{#                <h3>Input Slab Dimensions</h3>#}
+{#                <table class="table">#}
+{#                    <thead>#}
+{#                        <tr>#}
+{#                            <th>Length</th>#}
+{#                            <th>Width</th>#}
+{#                        </tr>#}
+{#                    </thead>#}
+{#                    <tbody>#}
+{#                        <tr>#}
+{#                            <td><input class="form-control" name="slab_length" id="slab_length" type="number" value="{% if slab_l %}{{ slab_l }}{% else %}138{% endif %}" min="0"></td>#}
+{#                            <td><input class="form-control" name="slab_width" id="slab_width" type="number" value="{% if slab_w %}{{ slab_w }}{% else %}78{% endif %}" min="0"></td>#}
+{#                        </tr>#}
+{#                    </tbody>#}
+{#                </table>#}
+{#            </div>#}
+            {% if panel_obj %}
                 <div class="mb-5">
-                    <h3>Download Zip File</h3>
-                    <form method="post" action="{% url 'bin_packing:zip_file_handle' %}" id="download_csv_form">
-                        {% csrf_token %}
-                        <input type="hidden" id="panel_obj_id" name="panel_obj_id" value="{{ panel_obj_id }}">
-                        <button class="btn btn-success" type="button" id="download_button"> Download</button>
-                    </form>
+                    <h3>Download</h3>
+                    <div class="d-flex">
+                        <form method="post" action="{% url 'bin_packing:zip_file_handle' %}" id="download_csv_form" class="me-3">
+                            {% csrf_token %}
+                            <input type="hidden" id="panel_obj_id" name="panel_obj_id" value="{{ panel_obj.id }}">
+                            <button class="btn btn-success" type="button" id="download_button"> Zip File <i class="fa-solid fa-file-zipper"></i> </button>
+                        </form>
+                        {% if panel_obj.pdf_file %}
+                            <a href="{{ panel_obj.pdf_file.url }}" class="btn btn-success me-3">PDF File <i class="fa-solid fa-file"></i></a>
+                        {% endif %}
+                    </div>
                 </div>
             {% endif %}
+
         </div>
 
         <!-- GRAPH PLOT SECTION -->
@@ -187,18 +193,17 @@
 {% block javascripts %}
     <script src="{% static 'js/script.js' %}"></script>
     <script>
+        function roundToTwo(num) {
+            return Math.round(num * 100) / 100;
+        }
         document.addEventListener('DOMContentLoaded', function() {
             const result = {{ result|safe }}; // Django template rendering the data safely
             const data = result['plots'];
             let cutting_blade_margin_5mm = 5 / 25.4;
-            
+
             // declaring container width and heights
-            let container_l = 78
-            let container_w = 138
-            
-            // declaring scaling ratios
-            let scale_length = container_l / {{ slab_l }}
-            let scale_width = container_w / {{ slab_w }}
+            let container_height = {{ slab_w }}
+            let container_width = {{ slab_l }}
 
             data.forEach((plot, index) => {
                 // Create a container for each plot
@@ -208,20 +213,21 @@
                 plotContainer.style.border = '1px solid #ccc';
                 plotContainer.style.padding = '0';
                 plotContainer.classList.add('shadow-sm');
+                
                 // Create SVG element for each plot
                 const svgContainer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-                svgContainer.setAttribute("viewBox", `0 0 ${container_w} ${container_l}`); // Set the view box based on slab dimensions
+                svgContainer.setAttribute("viewBox", `0 0 ${container_width} ${container_height}`); // Set the view box based on slab dimensions
                 svgContainer.setAttribute("style", "border: 1px solid black;");
                 plotContainer.appendChild(svgContainer);
 
                 // Add rectangles to the SVG
                 plot.rectangles.forEach(rect => {
-                    let actual_width = rect.width - cutting_blade_margin_5mm;
-                    let actual_height = rect.height - cutting_blade_margin_5mm;
+                    let actual_width = roundToTwo(rect.width - cutting_blade_margin_5mm);
+                    let actual_height = roundToTwo(rect.height - cutting_blade_margin_5mm);
 
                     const rectElem = document.createElementNS("http://www.w3.org/2000/svg", "rect");
                     rectElem.setAttribute("x", rect.x);
-                    rectElem.setAttribute("y", container_l - rect.y - rect.height); // Invert y-axis calculation
+                    rectElem.setAttribute("y", container_height - rect.y - rect.height); // Invert y-axis calculation
                     rectElem.setAttribute("width", rect.width);
                     rectElem.setAttribute("height", rect.height);
                     rectElem.setAttribute('style', 'stroke: #000000; stroke-width: 0.1; fill: #add8e6;'); // Light blue fill

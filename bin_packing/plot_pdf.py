@@ -37,12 +37,12 @@ def draw_heading_container(c, data):
     return heading_height, heading_y_position
 
 
-def draw_main_container(c, heading_y, heading_h, rectangles, container_width=138, container_height=78):
+def draw_main_container(c, heading_y, heading_h, rectangles, slab_width=138, slab_height=78):
     container_h = 0.3 * page_height
     container_y = heading_y + heading_h + margin_between_container_and_heading
 
-    scale_width = WIDTH / container_width
-    scale_height = container_h / container_height
+    scale_width = WIDTH / slab_width
+    scale_height = container_h / slab_height
 
     for rect in rectangles:
         scaled_width = rect['width'] * scale_width

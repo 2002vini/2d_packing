@@ -191,6 +191,14 @@
             const result = {{ result|safe }}; // Django template rendering the data safely
             const data = result['plots'];
             let cutting_blade_margin_5mm = 5 / 25.4;
+            
+            // declaring container width and heights
+            let container_l = 78
+            let container_w = 138
+            
+            // declaring scaling ratios
+            let scale_length = container_l / {{ slab_l }}
+            let scale_width = container_w / {{ slab_w }}
 
             data.forEach((plot, index) => {
                 // Create a container for each plot
@@ -202,23 +210,22 @@
                 plotContainer.classList.add('shadow-sm');
                 // Create SVG element for each plot
                 const svgContainer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-                svgContainer.setAttribute("viewBox", "0 0 138 78"); // Set the view box based on slab dimensions
-                svgContainer.setAttribute("style", "border: px solid black;");
+                svgContainer.setAttribute("viewBox", `0 0 ${container_w} ${container_l}`); // Set the view box based on slab dimensions
+                svgContainer.setAttribute("style", "border: 1px solid black;");
                 plotContainer.appendChild(svgContainer);
 
                 // Add rectangles to the SVG
                 plot.rectangles.forEach(rect => {
+                    let actual_width = rect.width - cutting_blade_margin_5mm;
+                    let actual_height = rect.height - cutting_blade_margin_5mm;
+
                     const rectElem = document.createElementNS("http://www.w3.org/2000/svg", "rect");
                     rectElem.setAttribute("x", rect.x);
-                    rectElem.setAttribute("y", 78 - rect.y - rect.height); // Invert y-axis calculation
+                    rectElem.setAttribute("y", container_l - rect.y - rect.height); // Invert y-axis calculation
                     rectElem.setAttribute("width", rect.width);
                     rectElem.setAttribute("height", rect.height);
                     rectElem.setAttribute('style', 'stroke: #000000; stroke-width: 0.1; fill: #add8e6;'); // Light blue fill
-                    {#rectElem.setAttribute("fill", "#add8e6"); // Light blue fill#}
                     svgContainer.appendChild(rectElem);
-
-                    let actual_width = rect.width - cutting_blade_margin_5mm;
-                    let actual_height = rect.height - cutting_blade_margin_5mm;
 
                     // Tooltip on hover
                     const tooltip = document.createElement("div");

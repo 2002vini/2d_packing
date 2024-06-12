@@ -25,7 +25,7 @@ def draw_heading_container(c, data):
         ("Total area used (%):", f"{data['total_area_used_percent']}%"),
         ("Total area wasted (%):", f"{data['total_area_wasted_percent']}%"),
         ("Total no of slabs used:", f"{data['total_no_of_slabs_used']}"),
-        ("Slab Size:", f"{data['slab_width']} x {data['slab_height']}"),
+        ("Slab Size:", f"{data['slab_length']} x {data['slab_width']}"),
     ]
 
     c.setFont("Helvetica", 10)

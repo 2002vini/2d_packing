@@ -78,8 +78,8 @@ def create_pdf_file(context):
         'total_area_wasted_percent': context['global_waste_area_percentage'],
         'total_no_of_slabs_used': result['total_bins_used'],
         'total_area_of_single_slab': round(result['slab_total_area'] / 144, 2),   # divide by 144 to get area in sq. ft.
-        'slab_width': context['slab_l'],
-        'slab_height': context['slab_w']
+        'slab_width': context['slab_w'],
+        'slab_length': context['slab_l']
     }
 
     for idx, plot in enumerate(result['plots']):
@@ -143,7 +143,6 @@ def custom_data_input(algo, heuristic, filename=None, slab_l=138, slab_w=78):
                 for _ in range(int(quantity)):
                     # demoList.append(g.Item(height, width))
                     demoList.append(CustomItem(height, width, code, polish_edge_l, polish_edge_w))
-
     else:
         raise ValueError("Please provide a valid filename.")
 

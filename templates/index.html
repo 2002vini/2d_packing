@@ -191,14 +191,11 @@
             const result = {{ result|safe }}; // Django template rendering the data safely
             const data = result['plots'];
             let cutting_blade_margin_5mm = 5 / 25.4;
-            
+
             // declaring container width and heights
-            let container_l = 78
-            let container_w = 138
-            
-            // declaring scaling ratios
-            let scale_length = container_l / {{ slab_l }}
-            let scale_width = container_w / {{ slab_w }}
+            let container_height = {{ slab_w }}
+            let container_width = {{ slab_l }}
+            console.log(container_height, container_width)
 
             data.forEach((plot, index) => {
                 // Create a container for each plot
@@ -211,7 +208,7 @@
                 
                 // Create SVG element for each plot
                 const svgContainer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-                svgContainer.setAttribute("viewBox", `0 0 ${container_w} ${container_l}`); // Set the view box based on slab dimensions
+                svgContainer.setAttribute("viewBox", `0 0 ${container_width} ${container_height}`); // Set the view box based on slab dimensions
                 svgContainer.setAttribute("style", "border: 1px solid black;");
                 plotContainer.appendChild(svgContainer);
 
@@ -222,7 +219,7 @@
 
                     const rectElem = document.createElementNS("http://www.w3.org/2000/svg", "rect");
                     rectElem.setAttribute("x", rect.x);
-                    rectElem.setAttribute("y", container_l - rect.y - rect.height); // Invert y-axis calculation
+                    rectElem.setAttribute("y", container_height - rect.y - rect.height); // Invert y-axis calculation
                     rectElem.setAttribute("width", rect.width);
                     rectElem.setAttribute("height", rect.height);
                     rectElem.setAttribute('style', 'stroke: #000000; stroke-width: 0.1; fill: #add8e6;'); // Light blue fill

@@ -75,9 +75,9 @@ def index(request):
             context['slab_l'] = slab_length
             context['slab_w'] = slab_width
             context['show_statistics'] = True
-            context['panel_obj_id'] = panel_obj.id
+            context['panel_obj'] = panel_obj
 
-            create_pdf_file(context)
+            create_pdf_file(context, panel_obj)
 
             return render(request, 'index.html', context)
 

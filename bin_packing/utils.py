@@ -63,9 +63,12 @@ def plot_graph(slab_data, num, total_bins_used, csv_file_id):
     plt.close(fig)
 
 
-def create_pdf_file(context):
-    c = canvas.Canvas(f"/home/vaibhav/test.pdf", pagesize=A4, bottomup=0)
-    # c = canvas.Canvas(f"{settings.BASE_DIR}/media/pdf/test.pdf", pagesize=A4, bottomup=0)
+def create_pdf_file(context, panel_instance):
+    pdf_path = os.path.join(settings.MEDIA_ROOT, 'pdf', str(panel_instance.id))
+    os.makedirs(os.path.dirname(pdf_path), exist_ok=True)  # Ensure the directory exists
+
+    # c = canvas.Canvas(f"/home/vaibhav/test.pdf", pagesize=A4, bottomup=0)
+    c = canvas.Canvas(pdf_path, pagesize=A4, bottomup=0)
     result = context['result']
     margin = 1 * cm  # Set a margin for aesthetics
     current_y = margin  # Start from the bottom of the page plus a margin
@@ -120,6 +123,10 @@ def create_pdf_file(context):
         plots_per_page += 1
 
     c.save()
+
+    # Save the file path in the database
+    panel_instance.pdf_file.name = os.path.join('pdf', str(panel_instance.id))
+    panel_instance.save()
 
 
 def custom_data_input(algo, heuristic, filename=None, slab_l=138, slab_w=78):

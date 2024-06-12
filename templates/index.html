@@ -81,16 +81,22 @@
 {#                    </tbody>#}
 {#                </table>#}
 {#            </div>#}
-            {% if panel_obj_id %}
+            {% if panel_obj %}
                 <div class="mb-5">
-                    <h3>Download Zip File</h3>
-                    <form method="post" action="{% url 'bin_packing:zip_file_handle' %}" id="download_csv_form">
-                        {% csrf_token %}
-                        <input type="hidden" id="panel_obj_id" name="panel_obj_id" value="{{ panel_obj_id }}">
-                        <button class="btn btn-success" type="button" id="download_button"> Download</button>
-                    </form>
+                    <h3>Download</h3>
+                    <div class="d-flex">
+                        <form method="post" action="{% url 'bin_packing:zip_file_handle' %}" id="download_csv_form" class="me-3">
+                            {% csrf_token %}
+                            <input type="hidden" id="panel_obj_id" name="panel_obj_id" value="{{ panel_obj.id }}">
+                            <button class="btn btn-success" type="button" id="download_button"> Zip File <i class="fa-solid fa-file-zipper"></i> </button>
+                        </form>
+                        {% if panel_obj.pdf_file %}
+                            <a href="{{ panel_obj.pdf_file.url }}" class="btn btn-success me-3">PDF File <i class="fa-solid fa-file"></i></a>
+                        {% endif %}
+                    </div>
                 </div>
             {% endif %}
+
         </div>
 
         <!-- GRAPH PLOT SECTION -->
@@ -194,7 +200,7 @@
             const result = {{ result|safe }}; // Django template rendering the data safely
             const data = result['plots'];
             let cutting_blade_margin_5mm = 5 / 25.4;
-            
+
             // declaring container width and heights
             let container_height = {{ slab_w }}
             let container_width = {{ slab_l }}

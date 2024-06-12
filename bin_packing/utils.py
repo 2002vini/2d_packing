@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-import greedypacker as g
+import algorithms as g
 import csv
 import os
 from pathlib import Path
-from greedypacker.item import CustomItem
+from algorithms.item import CustomItem
 from bin_packing.plot_pdf import draw_heading_container, draw_stats_container, draw_main_container
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm

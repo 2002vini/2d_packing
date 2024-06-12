@@ -173,6 +173,11 @@
                     {% endfor %}
                 </div>
             </div>
+            <div class="p-3 mt-3 border shadow-sm">
+                NOTE: These calculations are done by adding some cutting blade margin of 5mm to each rectangle.
+                <br>5mm in width
+                <br>5mm in height
+            </div>
         </div>
         {% endif %}
     </div>
@@ -185,20 +190,20 @@
         document.addEventListener('DOMContentLoaded', function() {
             const result = {{ result|safe }}; // Django template rendering the data safely
             const data = result['plots'];
+            let cutting_blade_margin_5mm = 5 / 25.4;
 
             data.forEach((plot, index) => {
                 // Create a container for each plot
                 const plotContainer = document.createElement('div');
                 plotContainer.className = 'plot-container';
-                plotContainer.style.margin = '20px 0';
+                plotContainer.style.margin = '0 0 70px 0';
                 plotContainer.style.border = '1px solid #ccc';
                 plotContainer.style.padding = '0';
-
+                plotContainer.classList.add('shadow-sm');
                 // Create SVG element for each plot
                 const svgContainer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
                 svgContainer.setAttribute("viewBox", "0 0 138 78"); // Set the view box based on slab dimensions
                 svgContainer.setAttribute("style", "border: px solid black;");
-                svgContainer.classList.add('shadow-sm');
                 plotContainer.appendChild(svgContainer);
 
                 // Add rectangles to the SVG
@@ -212,10 +217,13 @@
                     {#rectElem.setAttribute("fill", "#add8e6"); // Light blue fill#}
                     svgContainer.appendChild(rectElem);
 
+                    let actual_width = rect.width - cutting_blade_margin_5mm;
+                    let actual_height = rect.height - cutting_blade_margin_5mm;
+
                     // Tooltip on hover
                     const tooltip = document.createElement("div");
                     rectElem.addEventListener('mouseover', function(event) {
-                        tooltip.innerHTML = `Width: ${rect.width} <br>Height: ${rect.height} <br>Area: ${rect.width * rect.height} <br>Product Code: ${rect.code} <br>Polish Length: ${rect.polish_edge_l} <br>Polish Width: ${rect.polish_edge_w} <br>RFT: ${rect.height * rect.polish_edge_l + rect.width * rect.polish_edge_w}`;
+                        tooltip.innerHTML = `Width: ${actual_width} <br>Height: ${actual_height} <br>Area: ${actual_width * actual_height} <br>Product Code: ${rect.code} <br>Polish Length: ${rect.polish_edge_l} <br>Polish Width: ${rect.polish_edge_w} <br>RFT: ${actual_height * rect.polish_edge_l + actual_width * rect.polish_edge_w}`;
                         tooltip.style.position = 'absolute';
                         tooltip.style.left = `${event.pageX + 10}px`;
                         tooltip.style.top = `${event.pageY + 10}px`;

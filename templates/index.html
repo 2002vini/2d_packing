@@ -64,23 +64,23 @@
                     <input class="form-control mb-3" name="csv_file" id="csv_file_input" type="file">
                 </form>
             </div>
-            <div class="mb-5">
-                <h3>Input Slab Dimensions</h3>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Length</th>
-                            <th>Width</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><input class="form-control" name="slab_length" id="slab_length" type="number" value="{% if slab_l %}{{ slab_l }}{% else %}138{% endif %}" min="0"></td>
-                            <td><input class="form-control" name="slab_width" id="slab_width" type="number" value="{% if slab_w %}{{ slab_w }}{% else %}78{% endif %}" min="0"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+{#            <div class="mb-5">#}
+{#                <h3>Input Slab Dimensions</h3>#}
+{#                <table class="table">#}
+{#                    <thead>#}
+{#                        <tr>#}
+{#                            <th>Length</th>#}
+{#                            <th>Width</th>#}
+{#                        </tr>#}
+{#                    </thead>#}
+{#                    <tbody>#}
+{#                        <tr>#}
+{#                            <td><input class="form-control" name="slab_length" id="slab_length" type="number" value="{% if slab_l %}{{ slab_l }}{% else %}138{% endif %}" min="0"></td>#}
+{#                            <td><input class="form-control" name="slab_width" id="slab_width" type="number" value="{% if slab_w %}{{ slab_w }}{% else %}78{% endif %}" min="0"></td>#}
+{#                        </tr>#}
+{#                    </tbody>#}
+{#                </table>#}
+{#            </div>#}
             {% if panel_obj_id %}
                 <div class="mb-5">
                     <h3>Download Zip File</h3>
@@ -187,15 +187,17 @@
 {% block javascripts %}
     <script src="{% static 'js/script.js' %}"></script>
     <script>
+        function roundToTwo(num) {
+            return Math.round(num * 100) / 100;
+        }
         document.addEventListener('DOMContentLoaded', function() {
             const result = {{ result|safe }}; // Django template rendering the data safely
             const data = result['plots'];
             let cutting_blade_margin_5mm = 5 / 25.4;
-
+            
             // declaring container width and heights
             let container_height = {{ slab_w }}
             let container_width = {{ slab_l }}
-            console.log(container_height, container_width)
 
             data.forEach((plot, index) => {
                 // Create a container for each plot
@@ -214,8 +216,8 @@
 
                 // Add rectangles to the SVG
                 plot.rectangles.forEach(rect => {
-                    let actual_width = rect.width - cutting_blade_margin_5mm;
-                    let actual_height = rect.height - cutting_blade_margin_5mm;
+                    let actual_width = roundToTwo(rect.width - cutting_blade_margin_5mm);
+                    let actual_height = roundToTwo(rect.height - cutting_blade_margin_5mm);
 
                     const rectElem = document.createElementNS("http://www.w3.org/2000/svg", "rect");
                     rectElem.setAttribute("x", rect.x);

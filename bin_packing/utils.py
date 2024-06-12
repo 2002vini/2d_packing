@@ -108,10 +108,11 @@ def create_pdf_file(context):
             plots_per_page = 0
 
         if idx == 0:
-            heading_h, heading_y = draw_heading_container(c, heading_data)
-            current_y += heading_h  # Adjust current_y to account for the height of the heading
+            heading_y_end_position = draw_heading_container(c, heading_data)
+            current_y += heading_y_end_position  # Adjust current_y to account for the height of the heading
 
-        container_y, container_h = draw_main_container(c, current_y, 0, rectangles)  # heading_h is 0 for subsequent pages
+        # container_y, container_h = draw_main_container(c, current_y, rectangles, float(context['slab_w']), float(context['slab_l']))
+        container_y, container_h = draw_main_container(c, current_y, rectangles)
         draw_stats_container(c, container_y, container_h, stats_data)
 
         # Update the current_y position and plots count

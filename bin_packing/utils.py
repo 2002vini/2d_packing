@@ -10,11 +10,66 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
 from reportlab.lib.pagesizes import A4
 from django.conf import settings
+import uuid
 
 SLAB_LENGTH = 138
 SLAB_WIDTH = 78
-cutting_blade_margin_5mm = 5 / 25.4     # considering 1 point == 1 inch
+cutting_blade_margin_5mm = 0.2    # considering 1 point == 1 inch
 
+def draw_nested_shapes(x, y, width, height, shapes, filename='plot.png'):
+    """
+    Draw a rectangle and nest various shapes inside it, saving the plot to a file.
+
+    Parameters:
+    x, y: Coordinates of the bottom-left corner of the rectangle.
+    width, height: Dimensions of the rectangle.
+    shapes: A list of tuples describing the shapes to be drawn inside the rectangle.
+    filename: Name of the file to save the plot.
+    """
+    fig, ax = plt.subplots()
+    # Draw the outer rectangle
+    outer_rect = patches.Rectangle((x, y), width, height, linewidth=1, edgecolor='g', facecolor='none')
+    ax.add_patch(outer_rect)
+
+    # Process each shape in the list
+    for shape in shapes:
+        type_shape = shape[0]
+        x_offset, y_offset = shape[1], shape[2]
+        params = shape[3:]
+
+        if type_shape == 'rectangle':
+            # Expecting parameters: height, width
+            height, width = params
+            rect = patches.Rectangle((x + x_offset, y + y_offset), width, height, linewidth=1, edgecolor='r', facecolor='none')
+            ax.add_patch(rect)
+
+        elif type_shape == 'L-shape':
+            # Expecting parameters: width, length, thickness
+            width, length, thickness = params
+            vertical = patches.Rectangle((x + x_offset, y + y_offset), thickness, length, linewidth=1, edgecolor='b', facecolor='none')
+            horizontal = patches.Rectangle((x + x_offset, y + y_offset), width, thickness, linewidth=1, edgecolor='b', facecolor='none')
+            ax.add_patch(vertical)
+            ax.add_patch(horizontal)
+
+        elif type_shape == 'complex-partition':
+            # Expecting parameters: total_width, total_height, inner_width, inner_height, thickness
+            total_width, total_height, inner_width, inner_height, thickness = params
+            outer = patches.Rectangle((x + x_offset, y + y_offset), total_width, total_height, linewidth=1, edgecolor='purple', facecolor='none')
+            ax.add_patch(outer)
+            vertical = patches.Rectangle((x + x_offset, y + y_offset), thickness, inner_height, linewidth=1, edgecolor='b', facecolor='none')
+            horizontal = patches.Rectangle((x + x_offset, y + y_offset), inner_width, thickness, linewidth=1, edgecolor='b', facecolor='none')
+            ax.add_patch(vertical)
+            ax.add_patch(horizontal)
+            square = patches.Rectangle((x + x_offset + thickness, y + y_offset + thickness), inner_width - thickness, inner_height - thickness, linewidth=1, edgecolor='blue', facecolor='none')
+            ax.add_patch(square)
+
+    plt.axis('scaled')
+    plt.savefig(filename)
+    plt.close()
+
+def sortListRectangles(list):
+    sorted_items = sorted(list, key=lambda item: item.width * item.height, reverse=True)
+    return sorted_items
 
 def plot_graph(slab_data, num, total_bins_used, csv_file_id):
     fig, ax = plt.subplots(figsize=(10, 8))
@@ -64,7 +119,7 @@ def plot_graph(slab_data, num, total_bins_used, csv_file_id):
 
 
 def create_pdf_file(context):
-    c = canvas.Canvas(f"/home/vaibhav/test.pdf", pagesize=A4, bottomup=0)
+    c = canvas.Canvas(f"/Users/vinihundlani/Desktop/greedypacker/static/img/test.pdf", pagesize=A4, bottomup=0)
     # c = canvas.Canvas(f"{settings.BASE_DIR}/media/pdf/test.pdf", pagesize=A4, bottomup=0)
     result = context['result']
     margin = 1 * cm  # Set a margin for aesthetics
@@ -126,7 +181,8 @@ def custom_data_input(algo, heuristic, filename=None, slab_l=138, slab_w=78):
     SLAB_WIDTH = slab_w
     M = g.BinManager(SLAB_LENGTH, SLAB_WIDTH, pack_algo=algo, heuristic=heuristic, rotation=True, sorting=True, wastemap=True)
     demoList = []
-
+    LShape_present=False
+    LShape_List=[]
     if filename:
         ROOT_DIR = Path(__file__).resolve().parent.parent
         file_path = f'{ROOT_DIR}/media/csv/{filename}'
@@ -136,32 +192,93 @@ def custom_data_input(algo, heuristic, filename=None, slab_l=138, slab_w=78):
                 height = float(item['length']) + cutting_blade_margin_5mm
                 width = float(item['width']) + cutting_blade_margin_5mm
                 quantity = int(item['quantity'])
+                thickness=float(item['thickness'])
                 code = item['code']
                 polish_edge_l = int(item['polish_edge_l'])
                 polish_edge_w = int(item['polish_edge_w'])
 
                 for _ in range(int(quantity)):
-                    # demoList.append(g.Item(height, width))
-                    demoList.append(CustomItem(height, width, code, polish_edge_l, polish_edge_w))
+                    if thickness>0:
+                        LShape_present=True
+                        LShape_List.append(CustomItem(height,width,code,polish_edge_l,polish_edge_w,thickness))
+                    else:
+                        demoList.append(CustomItem(height, width,code, polish_edge_l, polish_edge_w))
+                
+
+                if LShape_present:
+                    sortedList=sortListRectangles(demoList)
+                    LShape_List=sortListRectangles(LShape_List)
+                    print(len(LShape_List))
+                    #find largest rectanglw which can fit inside it
+                    #dimensions can be:
+                    for tile in LShape_List:
+                        print(tile)
+                        sortedList.sort(key=lambda item: item.width * item.height, reverse=True)
+                        max_length=tile.height-tile.thickness
+                        max_width=tile.width-tile.thickness
+                        print(f"max length that can be accomodated is {max_length}x{max_width}")
+                        mappedList={}
+                        included=False
+                        for item in sortedList:
+                            if min(item.height,item.width)<=min(max_length,max_width) and max(item.height,item.width)<=max(max_length,max_width):
+                                #we can use that rectangle 
+                                #create a new id
+                                #insert that in sorted list
+                                #sort that list again and map it to the new id which is generated
+                                print(f"we can fit {item} int the remaining area")
+                                if tile.height>=tile.width and item.height>=item.width:
+                                    inner_height=item.height
+                                    inner_width=item.width
+                                elif tile.height>=tile.width and item.width>=item.height:
+                                    inner_height=item.width
+                                    inner_width=item.height
+                                elif tile.width>=tile.height and item.width>=item.height:
+                                    inner_width=item.width
+                                    inner_height=item.height
+                                else:
+                                    inner_width=item.height
+                                    inner_height=item.width
+                                included=True
+                                unique_id = str(uuid.uuid4())
+                                mappedList[unique_id]=[item.id,tile.id]
+                                sortedList.remove(item)
+                                print("l shape item is:",tile)
+                                print("item we are adding is:",item)
+                                sortedList.append(CustomItem(tile.width,tile.height,unique_id,polish_edge_l,polish_edge_w,tile.thickness,inner_width,inner_height))
+                                break
+                            else:
+                                #we can't use that rectangle
+                                pass
+                        if not included:
+                            #iska matlab l shape ke andar koi inscribe nahi ho sakta hai
+                            sortedList.append(CustomItem(tile.width,tile.height,tile.id,polish_edge_l,polish_edge_w,tile.thickness))
+                    print("list after processing is:",sortedList)
+
+  
 
     else:
         raise ValueError("Please provide a valid filename.")
 
-    M.add_items(*demoList)
+    M.add_items(*sortedList)
     M.execute()
 
     slab_configurations = {}
+    print("printing slab configurations")
     for bin in M.bins:
-        rectangles = [(rectangle.width, rectangle.height, rectangle.x, rectangle.y, rectangle.code,
+        rectangles = [(rectangle.width, rectangle.height, rectangle.x, rectangle.y,rectangle.id,rectangle.thickness) for rectangle in bin.items]
+
+        rectangles = [(rectangle.width, rectangle.height, rectangle.x, rectangle.y, rectangle.code,rectangle.thickness,rectangle.innerWidth,rectangle.innerHeight,
                        rectangle.polish_edge_l, rectangle.polish_edge_w) for rectangle in bin.items]
         # Sort rectangles by position and size for consistent comparison
         rectangles.sort()
+        
         # Convert to a tuple for immutability and use as a dictionary key
         key = tuple(rectangles)
         if key in slab_configurations:
             slab_configurations[key] += 1
         else:
             slab_configurations[key] = 1
+        # draw_nested_shapes(0,0,slab_l,slab_w,shapes)
 
     # Prepare data to return, incorporating counts of each unique slab configuration
     plots = []
@@ -170,7 +287,7 @@ def custom_data_input(algo, heuristic, filename=None, slab_l=138, slab_w=78):
 
     for config, count in slab_configurations.items():
         slab_details = {}
-        plotList = [{"width": rect[0], "height": rect[1], "x": rect[2], "y": rect[3], "code": rect[4], "polish_edge_l": rect[5], "polish_edge_w": rect[6]} for rect in config]
+        plotList = [{"width": rect[0], "height": rect[1], "x": rect[2], "y": rect[3], "code": rect[4], "polish_edge_l": rect[8], "polish_edge_w": rect[9],"thickness":rect[5],"innerWidth":rect[6],"innerHeight":rect[7]} for rect in config]
         area_occupied = sum(rect[0] * rect[1] for rect in config)
         global_total_area_used += area_occupied * count
         percentage_occupied = round((area_occupied / slab_total_area) * 100, 3)

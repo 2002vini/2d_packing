@@ -30,15 +30,20 @@ class CustomItem(Item):
     """
     Customized Item class to include additional attributes: code, polish_edge_l, and polish_edge_w.
     """
-    def __init__(self, width, height, code, polish_edge_l, polish_edge_w, CornerPoint=(0, 0), rotation=True):
+    def __init__(self, width:float, height:float, code, polish_edge_l, polish_edge_w,thickness:float=0.0,innerWidth:float=0.0,innerHeight:float=0.0, CornerPoint=(0, 0), rotation=True):
         super().__init__(width, height, CornerPoint, rotation)
         self.code = code
         self.polish_edge_l = polish_edge_l
         self.polish_edge_w = polish_edge_w
+        self.thickness=thickness
+        self.innerWidth=innerWidth
+        self.innerHeight=innerHeight
 
     def __repr__(self):
         return (f'CustomItem(width={self.width!r}, height={self.height!r}, x={self.x!r}, y={self.y!r}, '
-                f'code={self.code!r}, polish_edge_l={self.polish_edge_l!r}, polish_edge_w={self.polish_edge_w!r})')
+            f'thickness={self.thickness!r}, innerWidth={self.innerWidth!r}, innerHeight={self.innerHeight!r}, '
+            f'code={self.code!r}, polish_edge_l={self.polish_edge_l!r}, polish_edge_w={self.polish_edge_w!r})')
+
 
     def rotate(self):
         super().rotate()

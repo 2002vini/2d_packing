@@ -62,7 +62,8 @@ def index(request):
             elif inventory_input_type == 'csv':
                 csv_file = request.FILES.get('csv_file')
                 panel_obj = Panel.objects.create(csv_file=csv_file)
-                result = custom_data_input(algo='maximal_rectangle', heuristic='best_area', filename=csv_file,
+                filename = panel_obj.csv_file.url.split('/')[-1]
+                result = custom_data_input(algo='maximal_rectangle', heuristic='best_area', filename=filename,
                                            slab_l=float(slab_length), slab_w=float(slab_width))
                 panel_obj.json_file = json.dumps(result)
                 panel_obj.save()

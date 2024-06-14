@@ -218,7 +218,11 @@
                 plotContainer.style.border = '1px solid #ccc';
                 plotContainer.style.padding = '0';
                 plotContainer.classList.add('shadow-sm');
-                
+
+                const layout_number = document.createElement('h2');
+                layout_number.innerHTML = `Layout ${index + 1} / {{ unique_layouts_count }}`;
+                plotContainer.appendChild(layout_number);
+
                 // Create SVG element for each plot
                 const svgContainer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
                 svgContainer.setAttribute("viewBox", `0 0 ${container_width} ${container_height}`); // Set the view box based on slab dimensions

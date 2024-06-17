@@ -38,110 +38,79 @@ def draw_heading_container(c, data):
     return heading_height, heading_y_position
 
 import cmath
+def draw_nested_container(c,x,y,rect,scale_width,scale_height):
+    c.setFillColor(colors.lightblue if rect['thickness'] == 0 else colors.transparent)
+    scaled_x=x+rect['x']*scale_width
+    scaled_y=y+rect['y']*scale_height
+    # scaled_y=y-(rect['y'] * scale_height + (rect['height'] * scale_height))
+    scaled_width = rect['width'] * scale_width
+    scaled_height = rect['height'] * scale_height
+    scaled_thickness_length=rect['thickness']*scale_height
+    scaled_thickness_width=rect['thickness']*scale_width
 
-def solve_quadratic(a, b, c):
-    # Calculate the discriminant
-    discriminant = b**2 - 4*a*c
+    if rect['thickness']==0:
+        c.setFillColor(colors.lightblue)
+        c.rect(scaled_x, scaled_y, scaled_width, scaled_height, stroke=1, fill=1)
+        #evaluate new coordinates
+
+    if rect['thickness']>0:
+        #making L shape
+        c.setStrokeColor(colors.black)
+        c.setLineWidth(1)
+        c.setFillColor(colors.lightblue)
+        c.rect(scaled_x,scaled_y, scaled_thickness_length, scaled_height, stroke=0, fill=1)
+        c.rect(scaled_x, scaled_y, scaled_width, scaled_thickness_width, stroke=0, fill=1)
+        
+        #evaluate new coordinates
+        new_x = scaled_x+scaled_thickness_length
+        new_y = scaled_y+scaled_thickness_width
+
+    c.setFillColor(colors.black)
+    c.setFont("Helvetica", 5)
+    rect_actual_width = round(rect['width'] - cutting_blade_margin_5mm,4)
+    rect_actual_height = round(rect['height'] - cutting_blade_margin_5mm,4)
     
-    # Calculate the two solutions using cmath to handle potential complex numbers
-    root1 = (-b - cmath.sqrt(discriminant)) / (2 * a)
-    root2 = (-b + cmath.sqrt(discriminant)) / (2 * a)
+    code_text = f"Code: {rect['code']}"
+    size_text = f"Size: {rect_actual_width} x {rect_actual_height}"
+    # # Calculate center positions
+    center_x = scaled_x + (scaled_thickness_length / 2 if scaled_thickness_length != 0 else scaled_width / 2)
+    center_y = scaled_y + (scaled_thickness_width / 2 if scaled_thickness_width != 0 else scaled_height/ 2)
+    if rect['width'] < rect['height']:
+        # Rotate text for vertical rectangles
+        c.saveState()
+        c.translate(x + scaled_width / 2, y + scaled_height / 2)
+        c.rotate(90)
+        c.drawCentredString(0, -1, code_text)  # Shift text slightly
+        c.drawCentredString(0, 5, size_text)
+        c.restoreState()
+    else:
+        c.drawCentredString(center_x, center_y - 3, code_text)
+        c.drawCentredString(center_x, center_y + 3, size_text)
+    
+    if rect['thickness']>0:
+        return new_x,new_y
+    return x,y
+    
+def call_dfs(c,scaled_x,scaled_y,rect,scale_width,scale_height):
+    new_x,new_y=draw_nested_container(c,scaled_x,scaled_y,rect,scale_width,scale_height)
+    for child in rect['child_items']:
+        call_dfs(c,new_x,new_y,child,scale_width,scale_height)
+    return
 
-    # Check if roots are real and return the non-negative or least negative root
-    if root1.imag == 0 and root2.imag == 0:  # Checks if both roots are real numbers
-        # Select the non-negative root or the root closer to zero if both are negative
-        if root1.real >= 0 and root2.real >= 0:
-            return min(root1.real, root2.real, key=abs)
-        elif root1.real >= 0:
-            return root1.real
-        elif root2.real >= 0:
-            return root2.real
-        else:
-            return min(root1.real, root2.real, key=abs)  # Both are negative, return the least negative
-    elif root1.imag == 0:  # Only root1 is real
-        return root1.real if root1.real >= 0 else None
-    elif root2.imag == 0:  # Only root2 is real
-        return root2.real if root2.real >= 0 else None
-    return None  # No real roots
-
-def draw_main_container(c, heading_y, heading_h, rectangles, container_width=138, container_height=78):
+def draw_main_container(c,heading_y,heading_h,rectangles,container_width=138,container_height=78):
     container_h = 0.3 * page_height
     container_y = heading_y + heading_h + margin_between_container_and_heading
 
     scale_width = WIDTH / container_width
     scale_height = container_h / container_height
    
-
     for rect in rectangles:
-        scaled_width = rect['width'] * scale_width
-        scaled_height = rect['height'] * scale_height
-        scaled_innerWidth = rect['innerWidth'] * scale_width
-        scaled_innerHeight=rect['innerHeight'] * scale_height
-        total_inner_area=scaled_innerHeight * scaled_innerWidth
-        L_Shape_Area=(scaled_width * scaled_height) - total_inner_area
-        scaled_thickness=solve_quadratic(1,-1*(scaled_width+scaled_height),L_Shape_Area)
-        scaled_thickness_length=rect['thickness']*scale_height
-        scaled_thickness_width=rect['thickness']*scale_width
-        print("scaled_thickness is:",scaled_thickness)
-        print("scaled_innerWidth is:",scaled_innerWidth)
-        print("scaled_innerHeight is:",scaled_innerHeight)
-        print("total_inner_area is:",total_inner_area)
-        print("scaled_width is:",scaled_width)
-        print("scaled_height is:",scaled_height)
-        print("L_Shape_Area is:",L_Shape_Area)
-        scaled_x = X + rect['x'] * scale_width
-        scaled_y = container_y + container_h - (rect['y'] * scale_height + scaled_height)
-        print("coordinates:",scaled_x,scaled_y,scaled_x+scaled_thickness,scaled_y+scaled_thickness)
-     
-        c.setFillColor(colors.lightblue if scaled_thickness == 0 else colors.transparent)
-        c.rect(scaled_x, scaled_y, scaled_width, scaled_height, stroke=1, fill=1)
-        if scaled_thickness > 0 and scaled_innerWidth==0.0 and scaled_innerHeight==0.0:
-            c.setFillColor(colors.darkblue)
-            c.rect(scaled_x, scaled_y, scaled_thickness_length, scaled_height, stroke=0, fill=1)
-            c.rect(scaled_x, scaled_y, scaled_width, scaled_thickness_width, stroke=0, fill=1)
-        elif scaled_innerWidth > 0 and scaled_innerHeight > 0:
-            print("complex shape")
-            # Draw inscribed L-shape
-            c.setFillColor(colors.darkblue)
-            c.rect(scaled_x, scaled_y, scaled_thickness_width, scaled_height, stroke=0, fill=1)
-            c.rect(scaled_x, scaled_y, scaled_width, scaled_thickness_length, stroke=0, fill=1)
-            
-            # Draw inner rectangle
-            c.setFillColor(colors.lightgreen)
-            # inner_scaled_x = scaled_x + scaled_thickness * scale_width
-            # inner_scaled_y = scaled_y + scaled_thickness * scale_height
-            # inner_scaled_width = scaled_innerWidth * scale_width
-            # inner_scaled_height = scaled_innerHeight * scale_height
-            # c.rect(inner_scaled_x, inner_scaled_y, inner_scaled_width, inner_scaled_height, stroke=1, fill=1)
-            c.rect(scaled_x+scaled_thickness_width, scaled_y+scaled_thickness_length, scaled_innerWidth, scaled_innerHeight, stroke=1, fill=1)
-
-
-        # Determine text orientation based on rectangle dimensions
-        c.setFillColor(colors.black)
-        c.setFont("Helvetica", 5)
-        rect_actual_width = rect['width'] - cutting_blade_margin_5mm
-        rect_actual_height = rect['height'] - cutting_blade_margin_5mm
-        
-
-        code_text = f"Code: {rect['code']}"
-        size_text = f"Size: {rect_actual_width} x {rect_actual_height}"
-        # Calculate center positions
-        center_x = scaled_x + scaled_width / 2
-        center_y = scaled_y + scaled_height / 2   
-
-        
-
-        if rect['width'] < rect['height']:
-            # Rotate text for vertical rectangles
-            c.saveState()
-            c.translate(scaled_x + scaled_width / 2, scaled_y + scaled_height / 2)
-            c.rotate(90)
-            c.drawCentredString(0, -1, code_text)  # Shift text slightly
-            c.drawCentredString(0, 5, size_text)
-            c.restoreState()
-        else:
-            c.drawCentredString(center_x, center_y - 3, code_text)
-            c.drawCentredString(center_x, center_y + 3, size_text)
+        abs_x=X
+        abs_y=container_y
+        # abs_y=container_y + container_h
+        # scaled_x = X + rect['x'] * scale_width
+        # scaled_y = container_y + container_h - (rect['y'] * scale_height + (rect['height'] * scale_height))
+        call_dfs(c,abs_x,abs_y,rect,scale_width,scale_height)
 
     c.setFillColor(colors.black)
     c.rect(X, container_y, WIDTH, container_h, stroke=1, fill=0)

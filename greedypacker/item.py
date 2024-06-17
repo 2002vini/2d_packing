@@ -27,23 +27,38 @@ class Item:
 
 
 class CustomItem(Item):
-    """
-    Customized Item class to include additional attributes: code, polish_edge_l, and polish_edge_w.
-    """
-    def __init__(self, width:float, height:float, code, polish_edge_l, polish_edge_w,thickness:float=0.0,innerWidth:float=0.0,innerHeight:float=0.0, CornerPoint=(0, 0), rotation=True):
+    def __init__(self, width: float, height: float, code, polish_edge_l, polish_edge_w, thickness: float = 0.0, child_items=None, CornerPoint=(0, 0), rotation=True):
         super().__init__(width, height, CornerPoint, rotation)
         self.code = code
         self.polish_edge_l = polish_edge_l
         self.polish_edge_w = polish_edge_w
-        self.thickness=thickness
-        self.innerWidth=innerWidth
-        self.innerHeight=innerHeight
+        self.thickness = thickness
+        # Initialize child_items as an empty list if None is provided
+        self.child_items = child_items if child_items is not None else []
 
     def __repr__(self):
         return (f'CustomItem(width={self.width!r}, height={self.height!r}, x={self.x!r}, y={self.y!r}, '
-            f'thickness={self.thickness!r}, innerWidth={self.innerWidth!r}, innerHeight={self.innerHeight!r}, '
-            f'code={self.code!r}, polish_edge_l={self.polish_edge_l!r}, polish_edge_w={self.polish_edge_w!r})')
-
+                f'thickness={self.thickness!r}, '
+                f'code={self.code!r}, polish_edge_l={self.polish_edge_l!r}, polish_edge_w={self.polish_edge_w!r}, '
+                f'child_items={self.child_items})')
 
     def rotate(self):
         super().rotate()
+        # Rotate all child items
+        for child in self.child_items:
+            child.rotate()
+
+    def add_child(self, child):
+        """Adds a new CustomItem to the child_items list."""
+        if isinstance(child, CustomItem):
+            self.child_items.append(child)
+        else:
+            raise ValueError("child must be an instance of CustomItem")
+
+    def remove_child(self, child):
+        """Removes a CustomItem from the child_items list."""
+        try:
+            self.child_items.remove(child)
+        except ValueError:
+            print("Item not found in the child list")
+

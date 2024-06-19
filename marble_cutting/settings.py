@@ -149,19 +149,19 @@ JAZZMIN_SETTINGS = {
     "site_title": "Admin",
 
     # Title on the login screen (19 chars max) (defaults to current_admin_site.site_header if absent or None)
-    "site_header": "Inani Marbles",
+    "site_header": "Electrocom",
 
     # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
-    "site_brand": "Inani Marbles",
+    "site_brand": "Electrocom",
 
     # Logo to use for your site, must be present in static files, used for brand on top left
-    "site_logo": "img/tiger_logo.png",
+    "site_logo": "img/electrocom_logo.png",
 
     # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
-    "login_logo": "img/tiger_logo.png",
+    "login_logo": "img/electrocom_logo.png",
 
     # Logo to use for login form in dark themes (defaults to login_logo)
-    "login_logo_dark": "img/tiger_logo.png",
+    "login_logo_dark": "img/electrocom_logo.png",
 
     # CSS classes that are applied to the logo above
     "site_logo_classes": "",
@@ -170,10 +170,10 @@ JAZZMIN_SETTINGS = {
     "site_icon": None,
 
     # Welcome text on the login screen
-    "welcome_sign": "Welcome to the Inani Marbles",
+    "welcome_sign": "Welcome to Electrocom",
 
     # Copyright on the footer
-    "copyright": "Inani Marbles and Industries LTD., 2024",
+    "copyright": "Electrocom @ 2024",
 
     # List of model admins to search from the search bar, search bar omitted if excluded
     # If you want to use a single search field you dont need to use a list, you can use a simple string

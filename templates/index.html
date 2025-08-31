@@ -153,23 +153,23 @@
                     <input class="form-control mb-3" name="csv_file" id="csv_file_input" type="file">
                 </form>
             </div>
-{#            <div class="mb-5">#}
-{#                <h3>Input Slab Dimensions</h3>#}
-{#                <table class="table">#}
-{#                    <thead>#}
-{#                        <tr>#}
-{#                            <th>Length</th>#}
-{#                            <th>Width</th>#}
-{#                        </tr>#}
-{#                    </thead>#}
-{#                    <tbody>#}
-{#                        <tr>#}
-{#                            <td><input class="form-control" name="slab_length" id="slab_length" type="number" value="{% if slab_l %}{{ slab_l }}{% else %}138{% endif %}" min="0"></td>#}
-{#                            <td><input class="form-control" name="slab_width" id="slab_width" type="number" value="{% if slab_w %}{{ slab_w }}{% else %}78{% endif %}" min="0"></td>#}
-{#                        </tr>#}
-{#                    </tbody>#}
-{#                </table>#}
-{#            </div>#}
+            <div class="mb-5">
+                <h3>Input Slab Dimensions</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Length</th>
+                            <th>Width</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input class="form-control" name="slab_length" id="slab_length" type="number" value="{% if slab_l %}{{ slab_l }}{% else %}138{% endif %}" min="0"></td>
+                            <td><input class="form-control" name="slab_width" id="slab_width" type="number" value="{% if slab_w %}{{ slab_w }}{% else %}78{% endif %}" min="0"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
             {% if panel_obj %}
                 <div class="mb-5">
                     <h3>Download</h3>
@@ -201,6 +201,7 @@
         function roundToTwo(num) {
             return Math.round(num * 100) / 100;
         }
+        {% if result %}
         document.addEventListener('DOMContentLoaded', function() {
             const result = {{ result|safe }}; // Django template rendering the data safely
             const data = result['plots'];
@@ -264,8 +265,33 @@
                 document.querySelector('#graph_section').appendChild(plotContainer);
             });
         });
+        {% endif %}
     </script>
-    
+    <script>
+        let download_button = document.getElementById('download_button')
+        if (download_button){
+            download_button.addEventListener('click', function() {
+                download_button.disabled = true;
+                let formData = new FormData(document.getElementById('download_csv_form'));
+                fetch('{% url 'bin_packing:zip_file_handle' %}',{
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.url) {
+                        window.location.href = data.url;  // This triggers the download
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        }
+    </script>
     <script>
         let currentIndex = 1;
         let totalSheets = {{ unique_layouts_count }};
@@ -273,42 +299,18 @@
         function sheetStatistics(direction) {
             // Hide current sheet
             document.getElementById('sheet-' + currentIndex).style.display = 'none';
-        
+
             // Calculate new index
             currentIndex += direction;
             if (currentIndex < 1) currentIndex = totalSheets;
             if (currentIndex > totalSheets) currentIndex = 1;
-        
+
             // Show new sheet
             document.getElementById('sheet-' + currentIndex).style.display = 'block';
-        
+
             // Update the sheet index display
             document.getElementById('current_layout').innerHTML = currentIndex + ' / ' + totalSheets;
         }
-    </script>
-    
-    <script>
-        let download_button = document.getElementById('download_button')
-        download_button.addEventListener('click', function() {
-            download_button.disabled = true;
-            let formData = new FormData(document.getElementById('download_csv_form'));
-            fetch('{% url 'bin_packing:zip_file_handle' %}',{
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.url) {
-                    window.location.href = data.url;  // This triggers the download
-                } else {
-                    alert('Error: ' + data.error);
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
     </script>
 {% endblock %}
 
